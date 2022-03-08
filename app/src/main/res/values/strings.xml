@@ -1,0 +1,14 @@
+<resources>
+    <string name="app_name">CoolerControl</string>
+    <string name="snav_cooler">Cooler</string>
+    <string name="snav_cloud">Cloud</string>
+    <string name="snav_gps">GPS</string>
+    <string name="snav_share">Share</string>
+    <string name="snav_text">Welcome to the Cooler Transport App</string>
+    <string name="snav_credit">Design by Taylor Ngo</string>
+    <string name="navigation_drawer_open">Open navigation drawer</string>
+    <string name="navigation_drawer_close">Close navigation drawer</string>
+    <string name="frag_cool">Cooler Fragment</string>
+    <string name="frag_cloud">Cloud Fragment</string>
+    <string name="frag_gps">GPS Fragment</string>
+</resources>
