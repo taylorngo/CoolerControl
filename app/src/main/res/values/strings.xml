@@ -1,20 +1,27 @@
 <resources>
-    <string name="app_name">CoolerControl</string>
+    <string name="app_name">Cooler Controller</string>
+
     <string name="snav_cooler">Cooler</string>
     <string name="snav_cloud">Cloud</string>
     <string name="snav_gps">GPS</string>
     <string name="snav_share">Share</string>
+    <string name="snav_help">Help</string>
     <string name="snav_text">Welcome to the Cooler Transport App</string>
     <string name="snav_credit">Design by Taylor Ngo</string>
     <string name="navigation_drawer_open">Open navigation drawer</string>
     <string name="navigation_drawer_close">Close navigation drawer</string>
+
     <string name="frag_cool">Cooler Fragment</string>
     <string name="frag_cloud">Cloud Fragment</string>
     <string name="frag_gps">GPS Fragment</string>
+    <string name="frag_help">Help Fragment</string>
+
     <string name="default_temp">20</string>
     <string name="temp_unit">&#176;C</string>
+
     <string name="toast_button_text">Update System</string>
     <string name="toast_output">System Updated!</string>
+
     <string name="random_button_text">Random</string>
     <string name="count_button_text">Count</string>
     <string name="temp_up_button">Temp Up</string>

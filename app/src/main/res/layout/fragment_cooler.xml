@@ -73,7 +73,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_below="@+id/textview_first"
-        android:layout_marginTop="337dp"
+        android:layout_marginTop="335dp"
         android:text="@string/temp_up_button"
         app:layout_constraintBottom_toTopOf="@+id/down_count_button"
         app:layout_constraintEnd_toEndOf="parent"

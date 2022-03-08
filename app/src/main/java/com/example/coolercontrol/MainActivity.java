@@ -55,6 +55,10 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container,
                         new GPSFragment()).commit();
                 break;
+            case R.id.nav_help:
+                getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container,
+                        new HelpFragment()).commit();
+                break;
             case R.id.nav_share:
                 Toast.makeText(this, "Share", Toast.LENGTH_SHORT).show();
                 break;

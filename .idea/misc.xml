@@ -7,7 +7,8 @@
         <entry key="app/src/main/res/layout/fragment_cloud.xml" value="0.1609375" />
         <entry key="app/src/main/res/layout/fragment_cooler.xml" value="0.27957916259765636" />
         <entry key="app/src/main/res/layout/fragment_gps.xml" value="0.1" />
-        <entry key="app/src/main/res/layout/nav_header.xml" value="0.1" />
+        <entry key="app/src/main/res/layout/fragment_help.xml" value="0.15476190476190477" />
+        <entry key="app/src/main/res/layout/nav_header.xml" value="0.31229248046875" />
         <entry key="app/src/main/res/menu/drawer_menu.xml" value="0.3182291666666667" />
       </map>
     </option>

@@ -16,6 +16,10 @@
             android:id="@+id/nav_gps"
             android:icon="@drawable/ic_gps"
             android:title="@string/snav_gps" />
+        <item
+            android:id="@+id/nav_help"
+            android:icon="@drawable/ic_help"
+            android:title="@string/snav_help" />
     </group>
 
     <item android:title="Communicate">
