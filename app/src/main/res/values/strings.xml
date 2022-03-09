@@ -26,4 +26,5 @@
     <string name="count_button_text">Count</string>
     <string name="temp_up_button">Temp Up</string>
     <string name="temp_down_button">Temp Down</string>
+    <string name="nav_image_text">Android App Image</string>
 </resources>
