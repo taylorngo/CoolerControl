@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@android:color/holo_blue_bright"
-    xmlns:tools="http://schemas.android.com/tools"
+    android:background="@android:color/holo_blue_light"
     tools:context=".MainActivity">
 
 
@@ -17,6 +17,7 @@
         android:textColor="@color/black"
         android:textSize="72sp"
         android:typeface="sans"
+        android:layout_marginTop="50dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
@@ -31,9 +32,9 @@
         android:textColor="@color/black"
         android:textSize="72sp"
         android:typeface="sans"
+        android:layout_marginTop="50dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toEndOf="@+id/textview_first"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintVertical_bias="0" />
@@ -43,8 +44,8 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_below="@+id/up_count_button"
-        android:layout_marginStart="24dp"
-        android:layout_marginTop="148dp"
+        android:layout_marginStart="160dp"
+        android:layout_marginTop="80dp"
         android:background="@color/buttonBackground"
         android:text="@string/toast_button_text"
         android:textColor="@color/black"
@@ -57,7 +58,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_below="@+id/textView_units"
-        android:layout_marginStart="152dp"
+        android:layout_marginStart="80dp"
         android:layout_marginTop="335dp"
         android:layout_toEndOf="@+id/up_count_button"
         android:background="@color/buttonBackground"
@@ -72,8 +73,10 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_below="@+id/textview_first"
+        android:layout_marginStart="80dp"
         android:layout_marginTop="335dp"
         android:text="@string/temp_up_button"
+        android:background="@color/buttonBackground"
         app:layout_constraintBottom_toTopOf="@+id/down_count_button"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"

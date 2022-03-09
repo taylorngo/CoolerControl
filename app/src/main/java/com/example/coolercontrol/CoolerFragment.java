@@ -35,13 +35,12 @@ public class CoolerFragment extends Fragment {
     }
 
 
-    @Nullable
     @Override
     public View onCreateView( LayoutInflater inflater,  ViewGroup container,  Bundle savedInstanceState) {
         View fragmentFirstLayout = inflater.inflate(R.layout.fragment_cooler, container, false);
         //Get the count text view
         showCountTextView = fragmentFirstLayout.findViewById(R.id.textview_first);
-        return inflater.inflate(R.layout.fragment_cooler, container, false);
+        return fragmentFirstLayout;
     }
 
     public void onViewCreated(@NonNull View view, Bundle savedInstanceState) {
