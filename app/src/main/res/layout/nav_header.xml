@@ -19,11 +19,12 @@
         android:paddingTop="8dp"
         android:text="@string/snav_text"
         android:textAppearance="@style/TextAppearance.AppCompat.Body1"
-        android:textSize="32dp"/>
+        android:textSize="32sp" />
 
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="@string/snav_credit" />
+        android:text="@string/snav_credit"
+        android:textSize="16sp" />
 
 </LinearLayout>
