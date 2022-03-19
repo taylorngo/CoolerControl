@@ -36,7 +36,7 @@ public class CoolerFragment extends Fragment {
 
 
     @Override
-    public View onCreateView( LayoutInflater inflater,  ViewGroup container,  Bundle savedInstanceState) {
+    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View fragmentFirstLayout = inflater.inflate(R.layout.fragment_cooler, container, false);
         //Get the count text view
         showCountTextView = fragmentFirstLayout.findViewById(R.id.textview_first);
@@ -69,8 +69,9 @@ public class CoolerFragment extends Fragment {
         });
 
     }
+
     @Override
-    public void onDestroyView(){
+    public void onDestroyView() {
         super.onDestroyView();
     }
 }
