@@ -7,6 +7,7 @@ import androidx.appcompat.widget.Toolbar;
 import androidx.core.view.GravityCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
 
+import android.bluetooth.BluetoothAdapter;
 import android.location.LocationManager;
 import android.os.Bundle;
 import android.view.MenuItem;
@@ -16,7 +17,11 @@ import com.google.android.material.navigation.NavigationView;
 
 public class MainActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener {
     private DrawerLayout drawer;
+    BluetoothAdapter bluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
 
+    public BluetoothAdapter getBluetoothAdapter() {
+        return bluetoothAdapter;
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

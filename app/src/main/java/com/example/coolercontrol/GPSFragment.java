@@ -11,8 +11,9 @@ import androidx.fragment.app.Fragment;
 
 
 public class GPSFragment extends Fragment {
-
-
+    public GPSFragment(){
+        //Required Empty public constructor
+    }
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
