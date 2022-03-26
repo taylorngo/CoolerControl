@@ -28,6 +28,13 @@
             android:layout_height="match_parent"
             android:id="@+id/fragment_container"/>
 
+        <Button
+            android:id="@+id/askPermissions"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Ask Permissions"
+            android:textAllCaps="false"/>
+
     </LinearLayout>
 
     <com.google.android.material.navigation.NavigationView

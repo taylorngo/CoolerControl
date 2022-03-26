@@ -29,4 +29,7 @@
     <string name="nav_image_text">Android App Image</string>
 
     <string name="user_manual">Howdy, welcome to the </string>
+    <string name="tracker">Tracker</string>
+    <string name="start">start</string>
+    <string name="end">end</string>
 </resources>

@@ -8,21 +8,23 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:gravity="center"
-        android:text="Tracker"
+        android:text="@string/tracker"
         android:textSize="24sp"
         android:textStyle="bold" />
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:paddingHorizontal="16dp">
+        android:paddingHorizontal="16dp"
+        style = "?android:attr/buttonBarButtonStyle">
 
         <Button
             android:id="@+id/startButton"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:text="start" />
+            android:text="@string/start"
+            />
 
         <Button
             android:id="@+id/endButton"
@@ -30,12 +32,16 @@
             android:layout_height="wrap_content"
             android:layout_marginStart="8dp"
             android:layout_weight="1"
-            android:text="end"/>
+            android:text="@string/end"/>
     </LinearLayout>
-
-    <fragment
-        android:id="@+id/map"
-            android:name="com.google.android.gms.maps.SupportMapFragment"
+<RelativeLayout
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+    <com.google.android.gms.maps.MapView
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        android:id="@+id/mapView"
         android:layout_width="match_parent"
-        android:layout_height="match_parent" />
+        android:layout_height="match_parent"
+        />
+</RelativeLayout>
 </LinearLayout>
