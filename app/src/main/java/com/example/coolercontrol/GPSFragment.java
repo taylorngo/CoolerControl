@@ -36,7 +36,7 @@ public class GPSFragment extends Fragment implements OnMapReadyCallback {
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_gps, container, false);
-        mMapView = (MapView) view.findViewById(R.id.mapView);
+        //mMapView = (MapView) view.findViewById(R.id.mapView);
 
         Bundle mapViewBundle = null;
         if (savedInstanceState != null) {
