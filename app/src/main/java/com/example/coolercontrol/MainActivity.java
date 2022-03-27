@@ -141,7 +141,8 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                         new CloudFragment()).commit();
                 break;
             case R.id.nav_gps:
-                setContentView(R.layout.activity_maps);
+                Intent i = new Intent(MainActivity.this,MapsActivity.class);
+                startActivity(i);
                 break;
             case R.id.nav_help:
                 getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container,

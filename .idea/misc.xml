@@ -6,7 +6,7 @@
         <entry key="app/src/main/res/drawable/ic_help.xml" value="0.2135" />
         <entry key="app/src/main/res/layout/activity_gpsactivity.xml" value="0.1" />
         <entry key="app/src/main/res/layout/activity_main.xml" value="0.168414306640625" />
-        <entry key="app/src/main/res/layout/activity_maps.xml" value="0.15476190476190477" />
+        <entry key="app/src/main/res/layout/activity_maps.xml" value="0.1" />
         <entry key="app/src/main/res/layout/fragment_cloud.xml" value="0.1609375" />
         <entry key="app/src/main/res/layout/fragment_cooler.xml" value="0.27957916259765636" />
         <entry key="app/src/main/res/layout/fragment_gps.xml" value="0.17262725830078124" />
