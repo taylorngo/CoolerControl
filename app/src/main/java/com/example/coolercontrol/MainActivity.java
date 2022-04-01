@@ -9,6 +9,7 @@ import android.os.Bundle;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -29,6 +30,28 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     }
     private String[] PERMISSIONS;
     public String str_count= "20";
+    TextView showCountTextView;
+    Integer temp_count;
+
+    private void countUp(View view) {
+        //Get the value of the text view
+        String countString = showCountTextView.getText().toString();
+        //Convert value to a number and increment it
+        temp_count = Integer.parseInt(countString);
+        temp_count++;
+        //Display the new value in text view
+        showCountTextView.setText(temp_count.toString());
+    }
+
+    private void countDwn(View view) {
+        //Get the value of the text view
+        String countString = showCountTextView.getText().toString();
+        //Convert value to a number and increment it
+        temp_count= Integer.parseInt(countString);
+        temp_count--;
+        //Display the new value in text view
+        showCountTextView.setText(temp_count.toString());
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -46,6 +69,26 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 Manifest.permission.BLUETOOTH_SCAN,
                 Manifest.permission.BLUETOOTH_CONNECT
         };
+        findViewById(R.id.refresh_button).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Toast myToast = Toast.makeText(MainActivity.this, "System Updated!", Toast.LENGTH_SHORT);
+                myToast.show();
+            }
+        });
+
+        findViewById(R.id.down_count_button).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                countDwn(view);
+            }
+        });
+        findViewById(R.id.up_count_button).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                countUp(view);
+            }
+        });
 
         askPermissions.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -60,6 +103,9 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         CoolerFragment coolerFragment = new CoolerFragment();
         coolerFragment.setArguments(bundle);
 
+        showCountTextView = (TextView) findViewById(R.id.textview_first);
+        showCountTextView.setText(str_count);
+
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
@@ -72,11 +118,11 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         drawer.addDrawerListener(toggle);
         toggle.syncState();
 
-       if (savedInstanceState == null) {
+/*       if (savedInstanceState == null) {
             getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container,
                     new CoolerFragment()).commit();
             navigationView.setCheckedItem(R.id.nav_cooler);
-        }
+        }*/
     }
     private boolean hasPermissions(Context context, String... PERMISSIONS){
         if (context != null && PERMISSIONS != null){
@@ -136,8 +182,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     public boolean onNavigationItemSelected(@NonNull MenuItem item) {
         switch (item.getItemId()) {
             case R.id.nav_cooler:
-                getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container,
-                        new CoolerFragment()).commit();
                 break;
             case R.id.nav_cloud:
                 Intent i = new Intent(MainActivity.this,CloudActivity.class);

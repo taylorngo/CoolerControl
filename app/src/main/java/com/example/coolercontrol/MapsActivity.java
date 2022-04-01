@@ -159,6 +159,28 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
     private void showUserLocation(){
         mMap.isMyLocationEnabled();
     }
+    @Override
+    protected void onStart(){
+        super.onStart();
+    }
+    @Override
+    public void onResume(){
+        super.onResume();
+    }
+    @Override
+    public void onPause(){
+        super.onPause();
+    }
+    @Override
+    protected void onStop(){
+        super.onStop();
+        //Save values
+    }
+    @Override
+    protected void onDestroy(){
+        super.onDestroy();
+    }
+
 
 }
 

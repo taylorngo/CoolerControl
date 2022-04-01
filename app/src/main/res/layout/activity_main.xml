@@ -9,10 +9,11 @@
     tools:context=".MainActivity"
     tools:openDrawer="start">
 
-    <LinearLayout
+    <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:orientation="vertical">
+        android:orientation="vertical"
+        android:background="@android:color/holo_blue_light">
 
         <androidx.appcompat.widget.Toolbar
             android:layout_width="match_parent"
@@ -21,21 +22,90 @@
             android:id="@+id/toolbar"
             android:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar"
             app:popupTheme="@style/ThemeOverlay.AppCompat.Light"
-            android:elevation="4dp"/>
+            android:elevation="4dp" />
 
-        <FrameLayout
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:id="@+id/fragment_container"/>
+        <TextView
+            android:id="@+id/textview_first"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="124dp"
+            android:textColor="@color/black"
+            android:text="@string/default_temp"
+            android:textSize="72sp"
+            android:typeface="sans"
+            android:layout_marginTop="50dp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <TextView
+            android:id="@+id/textView_units"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="0dp"
+            android:layout_toEndOf="@+id/textview_first"
+            android:text="@string/temp_unit"
+            android:textColor="@color/black"
+            android:textSize="72sp"
+            android:typeface="sans"
+            android:layout_marginTop="50dp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toEndOf="@+id/textview_first"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintVertical_bias="0" />
+
+        <Button
+            android:id="@+id/refresh_button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/up_count_button"
+            android:layout_marginStart="160dp"
+            android:layout_marginTop="80dp"
+            android:background="@color/buttonBackground"
+            android:text="@string/toast_button_text"
+            android:textColor="@color/black"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/textview_first" />
+
+        <Button
+            android:id="@+id/down_count_button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/textView_units"
+            android:layout_marginStart="80dp"
+            android:layout_marginTop="335dp"
+            android:layout_toEndOf="@+id/up_count_button"
+            android:background="@color/buttonBackground"
+            android:text="@string/temp_down_button"
+            android:textColor="@color/black"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toEndOf="@+id/refresh_button"
+            app:layout_constraintTop_toBottomOf="@+id/up_count_button" />
+
+        <Button
+            android:id="@+id/up_count_button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/textview_first"
+            android:layout_marginStart="80dp"
+            android:layout_marginTop="335dp"
+            android:text="@string/temp_up_button"
+            android:background="@color/buttonBackground"
+            app:layout_constraintBottom_toTopOf="@+id/down_count_button"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/textview_first" />
 
         <Button
             android:id="@+id/askPermissions"
-            android:layout_width="wrap_content"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="Ask Permissions"
             android:textAllCaps="false"/>
 
-    </LinearLayout>
+    </RelativeLayout>
 
     <com.google.android.material.navigation.NavigationView
         android:layout_width="wrap_content"
