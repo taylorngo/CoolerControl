@@ -28,6 +28,12 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.CoolerControl">
         <activity
+            android:name=".HelpActivity"
+            android:exported="false" />
+        <activity
+            android:name=".CloudActivity"
+            android:exported="false" />
+        <activity
             android:name=".MapsActivity"
             android:exported="false" />
 

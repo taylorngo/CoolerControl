@@ -1,5 +1,16 @@
 package com.example.coolercontrol;
 
+import android.Manifest;
+import android.bluetooth.BluetoothAdapter;
+import android.content.Context;
+import android.content.Intent;
+import android.content.pm.PackageManager;
+import android.os.Bundle;
+import android.view.MenuItem;
+import android.view.View;
+import android.widget.Button;
+import android.widget.Toast;
+
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.ActionBarDrawerToggle;
 import androidx.appcompat.app.AppCompatActivity;
@@ -8,22 +19,7 @@ import androidx.core.app.ActivityCompat;
 import androidx.core.view.GravityCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
 
-import android.Manifest;
-import android.bluetooth.BluetoothAdapter;
-import android.content.Context;
-import android.content.Intent;
-import android.content.pm.PackageManager;
-import android.location.LocationManager;
-import android.os.Bundle;
-import android.view.MenuItem;
-import android.view.View;
-import android.widget.Button;
-import android.widget.TextView;
-import android.widget.Toast;
-
 import com.google.android.material.navigation.NavigationView;
-
-import org.w3c.dom.Text;
 
 public class MainActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener {
     DrawerLayout drawer;
@@ -32,7 +28,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         return bluetoothAdapter;
     }
     private String[] PERMISSIONS;
-    private Button AskPermissions;
+    public String str_count= "20";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -40,7 +36,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         setContentView(R.layout.activity_main);
 
 
-        AskPermissions = findViewById(R.id.askPermissions);
+        Button askPermissions = findViewById(R.id.askPermissions);
         PERMISSIONS = new String[] {
                 Manifest.permission.INTERNET,
                 Manifest.permission.ACCESS_COARSE_LOCATION,
@@ -51,7 +47,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 Manifest.permission.BLUETOOTH_CONNECT
         };
 
-        AskPermissions.setOnClickListener(new View.OnClickListener() {
+        askPermissions.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 if (!hasPermissions(MainActivity.this,PERMISSIONS)){
@@ -59,6 +55,10 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 }
             }
         });
+        Bundle bundle = new Bundle();
+        bundle.putString("bun_count", str_count);
+        CoolerFragment coolerFragment = new CoolerFragment();
+        coolerFragment.setArguments(bundle);
 
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
@@ -140,16 +140,16 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                         new CoolerFragment()).commit();
                 break;
             case R.id.nav_cloud:
-                getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container,
-                        new CloudFragment()).commit();
+                Intent i = new Intent(MainActivity.this,CloudActivity.class);
+                startActivity(i);
                 break;
             case R.id.nav_gps:
-                Intent i = new Intent(MainActivity.this,MapsActivity.class);
+                i = new Intent(MainActivity.this,MapsActivity.class);
                 startActivity(i);
                 break;
             case R.id.nav_help:
-                getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container,
-                        new HelpFragment()).commit();
+                i = new Intent(MainActivity.this,HelpActivity.class);
+                startActivity(i);
                 break;
             case R.id.nav_share:
                 Toast.makeText(this, "Share", Toast.LENGTH_SHORT).show();
@@ -160,12 +160,21 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         return true;
     }
     //Handles opening and closing NavDrawer
-    @Override
     public void onBackPressed() {
         if (drawer.isDrawerOpen(GravityCompat.START)) {
             drawer.closeDrawer(GravityCompat.START);
         } else {
             super.onBackPressed();
         }
+    }
+    @Override
+    public void onSaveInstanceState(Bundle outstate){
+        super.onSaveInstanceState(outstate);
+        outstate.putString("bun_count", str_count);
+    }
+    @Override
+    public void onRestoreInstanceState(Bundle savedInstanceState){
+        super.onRestoreInstanceState(savedInstanceState);
+        str_count = savedInstanceState.getString("bun_count");
     }
 }

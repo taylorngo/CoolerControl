@@ -20,6 +20,7 @@ import org.w3c.dom.Text;
 public class CoolerFragment extends Fragment {
     public TextView showCountTextView;
     Integer temp_count;
+    String str_temp;
 
     private void countUp(View view) {
         //Get the value of the text view
@@ -46,17 +47,25 @@ public class CoolerFragment extends Fragment {
         super.onCreate(savedInstanceState);
 
         if(savedInstanceState != null){
-            temp_count = savedInstanceState.getInt("temp_count",0);
+            str_temp = savedInstanceState.getString("bun_count");
+        }else{
+            str_temp = "20";
         }
     }
     @Override
     public View onCreateView( LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         //super.onCreateView(inflater,container,savedInstanceState);
+        Bundle bundle = this.getArguments();
+        if(bundle != null) {
+            str_temp = bundle.getString("bun_count");
+        }
         LayoutInflater lf = (LayoutInflater) getActivity().getApplicationContext().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         View v = lf.inflate(R.layout.fragment_cooler, null);
 
         //Get the count text view
         showCountTextView = (TextView) v.findViewById(R.id.textview_first);
+        showCountTextView.setText(str_temp);
+
         return v;
     }
 /*    @Override
@@ -91,10 +100,20 @@ public class CoolerFragment extends Fragment {
         });
 
     }
-
-    public void onSavedInstanceState(Bundle outState){
+    @Override
+    public void onViewStateRestored(@Nullable Bundle savedInstanceState){
+        super.onViewStateRestored(savedInstanceState);
+        if (savedInstanceState != null){
+            str_temp = savedInstanceState.getString("bun_count");
+        }
+    }
+    public void onSavedInstanceState(@NonNull Bundle outState){
         super.onSaveInstanceState(outState);
-        outState.putInt("temp_count", temp_count);
+        outState.putString("bun_count", str_temp);
+    }
+    @Override
+    public void onPause(){
+        super.onPause();
     }
 
     @Override
