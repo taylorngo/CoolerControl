@@ -29,8 +29,6 @@ import java.util.Locale;
 public class MapsActivity extends AppCompatActivity implements OnMapReadyCallback {
 
     private GoogleMap mMap;
-    private LocationRequest locationRequest;
-    private LocationCallback locationCallback;
     private FusedLocationProviderClient mFusedLocationClient;
     private int locationRequestCode = 1000;
     private double wayLatitude = 0.0, wayLongitude = 0.0;
@@ -45,39 +43,39 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_maps);
         // Obtain the SupportMapFragment and get notified when the map is ready to be used.
+        txtLocation = (TextView) findViewById(R.id.location_txt);
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
                 .findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
         //Set up FusedLocation
         mFusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
-        locationRequest = LocationRequest.create();
+        LocationRequest locationRequest = LocationRequest.create();
         locationRequest.setPriority(LocationRequest.PRIORITY_BALANCED_POWER_ACCURACY);
         locationRequest.setInterval(10*1000); //10 seconds
         locationRequest.setFastestInterval(5*1000); //5 seconds
 
-        locationCallback = new LocationCallback() {
-        @Override
-        public void onLocationResult(LocationResult locationResult){
-            if(locationResult == null){
-                return;
-            }
-            for(Location location : locationResult.getLocations()){
-                if(location != null){
-                    wayLongitude = location.getLongitude();
-                    wayLatitude = location.getLatitude();
-                    if(!isContinue){
-                        txtLocation.setText(String.format(Locale.US, "%s - %s", wayLatitude, wayLongitude));
-                    }
-                    else{
-                        stringBuilder.append(wayLatitude);
-                        stringBuilder.append("-");
-                        stringBuilder.append(wayLongitude);
-                        stringBuilder.append("\n\n");
-                        txtLocation.setText(stringBuilder.toString());
+        LocationCallback locationCallback = new LocationCallback() {
+            @Override
+            public void onLocationResult(LocationResult locationResult) {
+                if (locationResult == null) {
+                    return;
+                }
+                for (Location location : locationResult.getLocations()) {
+                    if (location != null) {
+                        wayLongitude = location.getLongitude();
+                        wayLatitude = location.getLatitude();
+                        if (!isContinue) {
+                            txtLocation.setText(String.format(Locale.US, "%s - %s", wayLatitude, wayLongitude));
+                        } else {
+                            stringBuilder.append(wayLatitude);
+                            stringBuilder.append("-");
+                            stringBuilder.append(wayLongitude);
+                            stringBuilder.append("\n\n");
+                            txtLocation.setText(stringBuilder.toString());
+                        }
                     }
                 }
             }
-        }
         };
         // check permission
         if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED
@@ -153,15 +151,15 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
         LatLng sydney = new LatLng(30, -96);
         mMap.addMarker(new MarkerOptions()
                 .position(sydney)
-                .title("Marker in Sydney"));
+                .title("Marker in Texas"));
         mMap.moveCamera(CameraUpdateFactory.newLatLng(sydney));
     }
     private void showUserLocation(){
         mMap.isMyLocationEnabled();
     }
-    @Override
-    protected void onStart(){
-        super.onStart();
+/*    @Override
+   protected void onStart(){
+       super.onStart();
     }
     @Override
     public void onResume(){
@@ -179,7 +177,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
     @Override
     protected void onDestroy(){
         super.onDestroy();
-    }
+    }*/
 
 
 }

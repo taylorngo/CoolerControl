@@ -98,11 +98,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 }
             }
         });
-        Bundle bundle = new Bundle();
-        bundle.putString("bun_count", str_count);
-        CoolerFragment coolerFragment = new CoolerFragment();
-        coolerFragment.setArguments(bundle);
-
         showCountTextView = (TextView) findViewById(R.id.textview_first);
         showCountTextView.setText(str_count);
 
@@ -118,11 +113,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         drawer.addDrawerListener(toggle);
         toggle.syncState();
 
-/*       if (savedInstanceState == null) {
-            getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container,
-                    new CoolerFragment()).commit();
-            navigationView.setCheckedItem(R.id.nav_cooler);
-        }*/
     }
     private boolean hasPermissions(Context context, String... PERMISSIONS){
         if (context != null && PERMISSIONS != null){
