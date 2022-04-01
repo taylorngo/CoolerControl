@@ -3,6 +3,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
+    android:id="@+id/rl_cooler"
     android:layout_height="match_parent"
     android:background="@android:color/holo_blue_light"
     tools:context=".MainActivity">
@@ -13,8 +14,8 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="124dp"
-        android:text="@string/default_temp"
         android:textColor="@color/black"
+        android:text="@string/default_temp"
         android:textSize="72sp"
         android:typeface="sans"
         android:layout_marginTop="50dp"

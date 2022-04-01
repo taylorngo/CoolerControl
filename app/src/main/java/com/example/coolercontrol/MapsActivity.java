@@ -3,6 +3,7 @@ package com.example.coolercontrol;
 
 import android.Manifest;
 import android.content.pm.PackageManager;
+import android.location.Location;
 import android.os.Bundle;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -12,6 +13,9 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 
 import com.google.android.gms.location.FusedLocationProviderClient;
+import com.google.android.gms.location.LocationCallback;
+import com.google.android.gms.location.LocationRequest;
+import com.google.android.gms.location.LocationResult;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
@@ -25,10 +29,15 @@ import java.util.Locale;
 public class MapsActivity extends AppCompatActivity implements OnMapReadyCallback {
 
     private GoogleMap mMap;
+    private LocationRequest locationRequest;
+    private LocationCallback locationCallback;
     private FusedLocationProviderClient mFusedLocationClient;
     private int locationRequestCode = 1000;
     private double wayLatitude = 0.0, wayLongitude = 0.0;
     private TextView txtLocation;
+    private StringBuilder stringBuilder;
+    private boolean isContinue = false;
+    private boolean isGPS = false;
 
 
     @Override
@@ -39,8 +48,37 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
                 .findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
+        //Set up FusedLocation
         mFusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
+        locationRequest = LocationRequest.create();
+        locationRequest.setPriority(LocationRequest.PRIORITY_BALANCED_POWER_ACCURACY);
+        locationRequest.setInterval(10*1000); //10 seconds
+        locationRequest.setFastestInterval(5*1000); //5 seconds
 
+        locationCallback = new LocationCallback() {
+        @Override
+        public void onLocationResult(LocationResult locationResult){
+            if(locationResult == null){
+                return;
+            }
+            for(Location location : locationResult.getLocations()){
+                if(location != null){
+                    wayLongitude = location.getLongitude();
+                    wayLatitude = location.getLatitude();
+                    if(!isContinue){
+                        txtLocation.setText(String.format(Locale.US, "%s - %s", wayLatitude, wayLongitude));
+                    }
+                    else{
+                        stringBuilder.append(wayLatitude);
+                        stringBuilder.append("-");
+                        stringBuilder.append(wayLongitude);
+                        stringBuilder.append("\n\n");
+                        txtLocation.setText(stringBuilder.toString());
+                    }
+                }
+            }
+        }
+        };
         // check permission
         if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED
                 && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
@@ -96,6 +134,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
         }
     }
 
+
     /**
      * Manipulates the map once available.
      * This callback is triggered when the map is ready to be used.
@@ -111,11 +150,15 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
         mMap = googleMap;
 
         // Add a marker in Sydney and move the camera
-        LatLng sydney = new LatLng(-34, 151);
+        LatLng sydney = new LatLng(30, -96);
         mMap.addMarker(new MarkerOptions()
                 .position(sydney)
                 .title("Marker in Sydney"));
         mMap.moveCamera(CameraUpdateFactory.newLatLng(sydney));
     }
+    private void showUserLocation(){
+        mMap.isMyLocationEnabled();
+    }
+
 }
 
