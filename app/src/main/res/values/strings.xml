@@ -32,4 +32,5 @@
     <string name="tracker">Tracker</string>
     <string name="start">start</string>
     <string name="end">end</string>
+    <string name="ask_perm">Ask Permissions</string>
 </resources>

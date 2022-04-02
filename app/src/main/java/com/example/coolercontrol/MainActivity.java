@@ -151,19 +151,19 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 Toast.makeText(this,"Bluetooth Admin Permission is denied",Toast.LENGTH_SHORT).show();
             }
             if(grantResults[4] == PackageManager.PERMISSION_GRANTED){
-                Toast.makeText(this,"Permission is granted",Toast.LENGTH_SHORT).show();
+                Toast.makeText(this,"Bluetooth Permission is granted",Toast.LENGTH_SHORT).show();
             }else{
-                Toast.makeText(this,"Permission is denied",Toast.LENGTH_SHORT).show();
+                Toast.makeText(this,"Bluetooth Permission is denied",Toast.LENGTH_SHORT).show();
             }
             if(grantResults[5] == PackageManager.PERMISSION_GRANTED){
-                Toast.makeText(this,"Permission is granted",Toast.LENGTH_SHORT).show();
+                Toast.makeText(this,"Bluetooth Scan Permission is granted",Toast.LENGTH_SHORT).show();
             }else{
-                Toast.makeText(this,"Permission is denied",Toast.LENGTH_SHORT).show();
+                Toast.makeText(this,"Bluetooth Scan Permission is denied",Toast.LENGTH_SHORT).show();
             }
             if(grantResults[6] == PackageManager.PERMISSION_GRANTED){
-                Toast.makeText(this,"Permission is granted",Toast.LENGTH_SHORT).show();
+                Toast.makeText(this,"Bluetooth Connect Permission is granted",Toast.LENGTH_SHORT).show();
             }else{
-                Toast.makeText(this,"Permission is denied",Toast.LENGTH_SHORT).show();
+                Toast.makeText(this,"Bluetooth Connect Permission is denied",Toast.LENGTH_SHORT).show();
             }
         }
     }

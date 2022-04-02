@@ -13,43 +13,52 @@
         android:textStyle="bold" />
 
     <LinearLayout
+        style="?android:attr/buttonBarButtonStyle"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:paddingHorizontal="16dp"
-        style = "?android:attr/buttonBarButtonStyle">
+        android:paddingHorizontal="16dp">
 
         <Button
             android:id="@+id/startButton"
+            style="?android:attr/buttonBarButtonStyle"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:text="@string/start"
-            />
+            android:text="@string/start" />
 
         <Button
             android:id="@+id/endButton"
+            style="?android:attr/buttonBarButtonStyle"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginStart="8dp"
             android:layout_weight="1"
-            android:text="@string/end"/>
+            android:text="@string/end" />
     </LinearLayout>
+
     <TextView
+        android:id="@+id/location_txt"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:gravity="center"
-        android:id="@+id/location_txt"
-        android:textSize="24dp"
-        android:textStyle="bold"/>
+        android:textSize="24sp"
+        android:text="Location"
+        android:textStyle="bold" />
+
     <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent">
-        <androidx.fragment.app.FragmentContainerView
+
+        <fragment xmlns:map="http://schemas.android.com/apk/res-auto"
             xmlns:tools="http://schemas.android.com/tools"
+            android:id="@+id/map"
+            android:name="com.google.android.gms.maps.SupportMapFragment"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:id="@+id/map"
-            tools:context=".MapsActivity"
-            android:name="com.google.android.gms.maps.SupportMapFragment" />
+            map:mapType="normal"
+            map:uiCompass="false"
+            map:uiRotateGestures="true"
+            map:uiZoomControls="true"
+            tools:context=".MapsActivity" />
     </RelativeLayout>
 </LinearLayout>

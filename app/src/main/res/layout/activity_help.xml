@@ -7,16 +7,54 @@
     android:background="@android:color/holo_green_light">
 
     <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:text="User Manual"
+        android:textSize="42sp"
+        android:textStyle="bold" />
+
+    <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="@string/frag_help"
+        android:text="Cooler Support"
         android:textSize="30sp"
-        android:layout_centerInParent="true"/>
-    <Button
-        android:id="@+id/askPermissions"
+        android:textStyle="bold" />
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="start"
+        android:text="The application is able to control the medical specimen transport cooler. To be able to start access to the cooler you must click the 'ASK PERMISSIONS' button prior to use. The 'TEMP UP' button will change the temperature up 1 celsius. The 'TEMP DOWN' button will change the temperature down 1 celsius. The 'UPDATE SYSTEM' button will push and fetch information from the cooler and sync with the application. "
+        android:textSize="18sp" />
+
+    <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Ask Permissions"
-        android:textAllCaps="false"/>
+        android:text="Cloud Support"
+        android:textSize="30sp"
+        android:textStyle="bold" />
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="start"
+        android:text="Cloud Support"
+        android:textSize="30sp" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="GPS Support"
+        android:textSize="30sp"
+        android:textStyle="bold" />
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="start"
+        android:text="GPS Support"
+        android:textSize="30sp" />
+
 
 </LinearLayout>
