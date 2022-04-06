@@ -202,7 +202,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         }
     }
     @Override
-    public void onSaveInstanceState(Bundle outstate){
+    public void onSaveInstanceState(@NonNull Bundle outstate){
         super.onSaveInstanceState(outstate);
         outstate.putString("bun_count", str_count);
     }
