@@ -38,4 +38,10 @@
     <string name="remove_location_updates">Remove location updates</string>
     <string name="location_updated">Location Updated: %1$s</string>
 
+    <string name="location_message_title">Location services not enabled</string>
+    <string name="location_message">You cannot record your metrics without location services.\nTurn on location services now?</string>
+    <string name="affirmative">OK</string>
+    <string name="cancel">Cancel</string>
+    <string name="cont">Continue</string>
+
 </resources>

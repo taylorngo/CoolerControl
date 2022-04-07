@@ -4,15 +4,18 @@ package com.example.coolercontrol;
 import android.Manifest;
 import android.Manifest.permission;
 import android.annotation.SuppressLint;
+import android.app.AlertDialog;
 import android.content.BroadcastReceiver;
 import android.content.ComponentName;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.ServiceConnection;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.location.Location;
+import android.location.LocationProvider;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.IBinder;
@@ -57,7 +60,7 @@ import java.util.Locale;
 import pub.devrel.easypermissions.EasyPermissions;
 
 public class MapsActivity extends AppCompatActivity
-        implements OnMapReadyCallback, SharedPreferences.OnSharedPreferenceChangeListener {
+        implements LocationUpdatesService.LocationCallback, OnMapReadyCallback {
 
     private static final int LOCATION_PERMISSION_REQUEST_CODE = 1;
     private boolean permissionGranted = false;
@@ -69,44 +72,13 @@ public class MapsActivity extends AppCompatActivity
     private final LatLng defaultLocation = new LatLng(30.612651, -96.333572);
     private static final String TAG = MapsActivity.class.getSimpleName();
     private boolean startTracking;
-    private Handler timeHandler = new Handler();
-    long startTime = 0L;
-    long timeInMillis = 0L;
-    long timeSwapBuffer = 0L;
-    long updatedTime = 0L;
-    private ArrayList<LatLng> geoPoints;
-    private ArrayList<Float> distances;
-    private float totalDistance;
-    private LocationCallback locationCallback;
-    private LocationRequest locationRequest;
-    private boolean mBound = false;
-    private LocationUpdatesService mService = null;
+    private ArrayList<LatLng> geoPoints = new ArrayList<>();
+    private LocationUpdatesService mService;
     private Button mRequestLocationUpdatesButton;
     private Button mRemoveLocationUpdatesButton;
-    private MyReceiver myReceiver;
 
-    private int locationRequestCode = 1000;
-    private double wayLatitude = 0.0, wayLongitude = 0.0;
+    private LocationUpdatesService mLocationUpdate;
     private TextView txtLocation;
-    private StringBuilder stringBuilder;
-    private boolean isContinue = false;
-    private boolean isGPS = false;
-
-    private final ServiceConnection mServiceConnection = new ServiceConnection() {
-        @Override
-        public void onServiceConnected(ComponentName componentName, IBinder service) {
-            LocationUpdatesService.LocalBinder binder = (LocationUpdatesService.LocalBinder) service;
-            mService = binder.getService();
-            mBound = true;
-        }
-
-        @Override
-        public void onServiceDisconnected(ComponentName componentName) {
-            mService = null;
-            mBound = false;
-        }
-    };
-
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -114,29 +86,35 @@ public class MapsActivity extends AppCompatActivity
         if (savedInstanceState != null) {
             lastKnownLocation = savedInstanceState.getParcelable(KEY_LOCATION);
         }
-        myReceiver = new MyReceiver();
         setContentView(R.layout.activity_maps);
+
         // Obtain the SupportMapFragment and get notified when the map is ready to be used.
         txtLocation = (TextView) findViewById(R.id.location_txt);
         SupportMapFragment mapFragment =
                 (SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
 
+        mLocationUpdate = new LocationUpdatesService(this ,this);
+
+        mRequestLocationUpdatesButton = (Button) findViewById(R.id.startButton);
+        mRemoveLocationUpdatesButton = (Button) findViewById(R.id.endButton);
+        mRequestLocationUpdatesButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                startTracking = true;
+                setButtonsState(true);
+            }
+        });
+        mRemoveLocationUpdatesButton.setOnClickListener(new View.OnClickListener(){
+            @Override
+            public void onClick(View view){
+                startTracking = false;
+                setButtonsState(false);
+            }
+        });
 
         //Set up FusedLocation
         mFusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
-        locationCallback = new LocationCallback() {
-            @Override
-            public void onLocationResult( LocationResult locationResult) {
-                if(locationResult == null){
-                    return;
-                }
-                for(Location location : locationResult.getLocations()){
-                    //Update UI with location data
-                }
-                super.onLocationResult(locationResult);
-            }
-        };
 
 /*        LocationRequest locationRequest = LocationRequest.create();
         locationRequest.setPriority(LocationRequest.PRIORITY_BALANCED_POWER_ACCURACY);
@@ -187,27 +165,9 @@ public class MapsActivity extends AppCompatActivity
     @Override
     protected void onStart(){
         super.onStart();
-        PreferenceManager.getDefaultSharedPreferences(this).registerOnSharedPreferenceChangeListener(this);
+        mLocationUpdate.connect();
 
-        mService = new LocationUpdatesService();
-        mRequestLocationUpdatesButton = (Button) findViewById(R.id.startButton);
-        mRemoveLocationUpdatesButton = (Button) findViewById(R.id.endButton);
-        mRequestLocationUpdatesButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                mService.requestLocationUpdates();
-            }
-        });
-        mRemoveLocationUpdatesButton.setOnClickListener(new View.OnClickListener(){
-            @Override
-            public void onClick(View view){
-                mService.removeLocationUpdates();
-            }
-        });
         setButtonsState(Utils.requestingLocationUpdates(this));
-
-        bindService(new Intent(this, LocationUpdatesService.class), mServiceConnection,
-                Context.BIND_AUTO_CREATE);
 
     }
     @Override
@@ -253,9 +213,6 @@ public class MapsActivity extends AppCompatActivity
         mMap.moveCamera(CameraUpdateFactory.newLatLng(defaultLocation));
 
     }
-    private void startLocationUpdates(){
-        mFusedLocationClient.requestLocationUpdates(locationRequest , locationCallback, Looper.getMainLooper());
-    }
 
     //handle new location
     public void handleNewLocation(Location location) {
@@ -263,44 +220,42 @@ public class MapsActivity extends AppCompatActivity
 
         double currentLatitude = location.getLatitude();
         double currentLongitude = location.getLongitude();
-        LatLng latLng = new LatLng(currentLatitude, currentLongitude);
+        LatLng point = new LatLng(currentLatitude, currentLongitude);
 
-        //Get the new geopoints to redraw the line on each iteration
-        geoPoints.add(latLng);
-        //get the latest distance update
-        if (geoPoints.size() > 2) {
-            calculateDistance();
+        if(geoPoints.size() == 1){
+            MarkerOptions options = new MarkerOptions().position(geoPoints.get(0)).title("Starting Point1");
+            mMap.addMarker(options);
         }
 
-        //draw the polyline
-        drawRoute();
-        MarkerOptions options = new MarkerOptions()
-                .position(latLng)
-                .title("I am here!");
-        mMap.addMarker(options);
-        mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(latLng,15));
-    }
+        if(startTracking){
+            geoPoints.add(point);
 
-    public void calculateDistance(){
-        Location newLoc = new Location("Latest Location");
-        Location oldLoc = new Location("Last known Location");
-        LatLng newPt = geoPoints.get(geoPoints.size()- 1);
-        LatLng oldPt = geoPoints.get(geoPoints.size()-2);
-        distances.add(oldLoc.distanceTo(newLoc));
-        //add to the distance variable
-        totalDistance = totalDistance + oldLoc.distanceTo(newLoc);
-        Log.d(TAG, "distance between points is: " + oldLoc.distanceTo(newLoc));
-    }
-
-    public void drawRoute(){
-        mMap.clear();
-        PolylineOptions options = new PolylineOptions().width(5).color(android.R.color.holo_blue_dark).geodesic(true).visible(true);
-        for(int i = 0; i < geoPoints.size(); i++){
-            LatLng pt = geoPoints.get(i);
-            options.add(pt);
+            PolylineOptions routeOptions = new PolylineOptions().addAll(geoPoints).color(R.color.ColorPolyline).width(10).visible(true);
+            mMap.addPolyline(routeOptions);
         }
-        Log.d(TAG,"GeoPoints recorded: " + geoPoints);
-        mMap.addPolyline(options);
+
+
+        mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(point, DEFAULT_ZOOM));
+    }
+
+    public void finishTracking(){
+        startTracking = false;
+        AlertDialog.Builder finishedDialog = new AlertDialog.Builder(MapsActivity.this);
+        finishedDialog.setTitle("Confirm Run Completion?");
+        finishedDialog.setMessage("This will stop and save the current run if you continue.");
+        finishedDialog.setPositiveButton(R.string.cont, new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                finish();
+            }
+        });
+        finishedDialog.setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                startTracking = true;
+            }
+        });
+        finishedDialog.show();
     }
 
     private void getDeviceLocation() {
@@ -375,73 +330,15 @@ public class MapsActivity extends AppCompatActivity
         }
     }
 
-
-    /**
-     * Manipulates the map once available.
-     * This callback is triggered when the map is ready to be used.
-     * This is where we can add markers or lines, add listeners or move the camera. In this case,
-     * we just add a marker near Sydney, Australia.
-     * <p>
-     * If Google Play services is not installed on the device, the user will be prompted to install
-     * it inside the SupportMapFragment. This method will only be triggered once the user has
-     * installed Google Play services and returned to the app.
-     */
-
-    private void showUserLocation() {
-        mMap.isMyLocationEnabled();
-    }
-
     @Override
     public void onPause(){
         super.onPause();
-        LocalBroadcastManager.getInstance(this).unregisterReceiver(myReceiver);
+        mLocationUpdate.disconnect();
     }
     @Override
     protected void onResume(){
         super.onResume();
-        LocalBroadcastManager.getInstance(this).registerReceiver(myReceiver, new IntentFilter(LocationUpdatesService.ACTION_BROADCAST));
-    }
-    @Override
-    protected void onStop(){
-        if (mBound){
-            unbindService(mServiceConnection);
-            mBound = false;
-        }
-        PreferenceManager.getDefaultSharedPreferences(this).unregisterOnSharedPreferenceChangeListener(this);
-        super.onStop();
-        //Save values
-    }
-
-    private void stopLocationUpdates(){
-        mFusedLocationClient.removeLocationUpdates(locationCallback);
-    }
-
-    @Override
-    public void onPointerCaptureChanged(boolean hasCapture) {
-        super.onPointerCaptureChanged(hasCapture);
-    }
-
-    /**
-     * Receiver for broadcasts sent by {@link LocationUpdatesService}.
-     */
-    private class MyReceiver extends BroadcastReceiver {
-        @Override
-        public void onReceive(Context context, Intent intent) {
-            Location location = intent.getParcelableExtra(LocationUpdatesService.EXTRA_LOCATION);
-            if (location != null) {
-                Toast.makeText(MapsActivity.this, Utils.getLocationText(location),
-                        Toast.LENGTH_SHORT).show();
-            }
-        }
-    }
-
-    @Override
-    public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String s) {
-        // Update the buttons state depending on whether location updates are being requested.
-        if (s.equals(Utils.KEY_REQUESTING_LOCATION_UPDATES)) {
-            setButtonsState(sharedPreferences.getBoolean(Utils.KEY_REQUESTING_LOCATION_UPDATES,
-                    false));
-        }
+        mLocationUpdate.connect();
     }
 
     private void setButtonsState(boolean requestingLocationUpdates) {
@@ -453,25 +350,6 @@ public class MapsActivity extends AppCompatActivity
             mRemoveLocationUpdatesButton.setEnabled(false);
         }
     }
-
-/*    @Override
-   protected void onStart(){
-       super.onStart();
-    }
-    @Override
-    public void onResume(){
-        super.onResume();
-    }
-    @Override
-    public void onPause(){
-        super.onPause();
-    }
-
-    @Override
-    protected void onDestroy(){
-        super.onDestroy();
-    }*/
-
 
 }
 
