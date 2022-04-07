@@ -56,28 +56,13 @@
             app:layout_constraintVertical_bias="0" />
 
         <Button
-            android:id="@+id/refresh_button"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_below="@+id/up_count_button"
-            android:layout_alignParentEnd="true"
-            android:layout_marginTop="80dp"
-            android:layout_marginEnd="60dp"
-            android:background="@color/buttonBackground"
-            android:text="@string/toast_button_text"
-            android:textColor="@color/black"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/textview_first" />
-
-        <Button
             android:id="@+id/down_count_button"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_below="@+id/textView_units"
             android:layout_alignParentEnd="true"
             android:layout_marginStart="80dp"
-            android:layout_marginTop="335dp"
+            android:layout_marginTop="130dp"
             android:layout_marginEnd="75dp"
             android:layout_toEndOf="@+id/up_count_button"
             android:background="@color/buttonBackground"
@@ -94,11 +79,26 @@
             android:layout_below="@+id/textview_first"
             android:layout_alignParentStart="true"
             android:layout_marginStart="80dp"
-            android:layout_marginTop="335dp"
+            android:layout_marginTop="130dp"
             android:background="@color/buttonBackground"
             android:text="@string/temp_up_button"
             app:layout_constraintBottom_toTopOf="@+id/down_count_button"
             app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/textview_first" />
+
+        <Button
+            android:id="@+id/refresh_button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/up_count_button"
+            android:layout_alignParentEnd="true"
+            android:layout_marginTop="80dp"
+            android:layout_marginEnd="60dp"
+            android:background="@color/buttonBackground"
+            android:text="@string/toast_button_text"
+            android:textColor="@color/black"
+            app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/textview_first" />
 
@@ -108,12 +108,20 @@
             android:layout_height="wrap_content"
             android:layout_below="@+id/up_count_button"
             android:layout_alignParentStart="true"
-            android:layout_alignParentBottom="true"
             android:layout_marginStart="80dp"
             android:layout_marginTop="80dp"
-            android:layout_marginBottom="74dp"
+            android:layout_marginEnd="30dp"
+            android:layout_toStartOf="@+id/refresh_button"
+            android:background="@color/buttonBackground"
+            android:textColor="@color/black"
+
             android:text="@string/ask_perm"
-            android:textAllCaps="false" />
+            />
+        <ListView
+            android:layout_below="@id/askPermissions"
+            android:layout_width="match_parent"
+            android:layout_height="150dp"
+            android:id="@+id/lvNewDevices"/>
 
     </RelativeLayout>
 

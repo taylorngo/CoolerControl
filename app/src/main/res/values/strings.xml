@@ -33,4 +33,5 @@
     <string name="start">start</string>
     <string name="end">end</string>
     <string name="ask_perm">Ask Permissions</string>
+    <string name="rationale_bluetooth">This app needs access to your bluetooth to connect to the cooler.</string>
 </resources>
