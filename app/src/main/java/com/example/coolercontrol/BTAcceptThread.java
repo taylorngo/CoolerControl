@@ -35,19 +35,27 @@ public class BTAcceptThread extends Thread{
     public void run() {
         BluetoothSocket socket = null;
         while (true) {
-            try{
+            try {
                 socket = btServerSocket.accept();
-            } catch (IOException e){
+            } catch (IOException e) {
                 Log.e(TAG, "Socket's accept() method failed", e);
                 break;
             }
-            if(socket != null){
-                //A connection was accepted. Perform work associated with the connection in a separate thread.
+
+            if (socket != null) {
+                // A connection was accepted. Perform work associated with
+                // the connection in a separate thread.
                 new ConnectedThread(socket);
-                btServerSocket.close();
+                try {
+                    btServerSocket.close();
+                } catch (IOException e) {
+                    Log.e(TAG, "Socket's close() method failed", e);
+
+                }
                 break;
             }
         }
+/*
         if(btServerSocket != null) {
             try {
                 socket = btServerSocket.accept();
@@ -67,6 +75,7 @@ public class BTAcceptThread extends Thread{
                 cancel();
             }
         }
+*/
 
     }
 

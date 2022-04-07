@@ -157,7 +157,7 @@ public class MainActivity extends BluetoothServer implements NavigationView.OnNa
             BluetoothDevice btDevice;
             // Register for broadcasts when a device is discovered.
             IntentFilter filter = new IntentFilter(BluetoothDevice.ACTION_FOUND);
-            registerReceiver(mBroadcastReceiver1, filter);
+            registerReceiver(mBroadcastReceiver2, filter);
             /*BluetoothAdapter bluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
             if(bluetoothAdapter == null){
                 //Device does not support bluetooth

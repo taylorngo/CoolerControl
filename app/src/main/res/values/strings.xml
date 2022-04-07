@@ -34,4 +34,8 @@
     <string name="end">end</string>
     <string name="ask_perm">Ask Permissions</string>
     <string name="rationale_bluetooth">This app needs access to your bluetooth to connect to the cooler.</string>
+    <string name="launch_activity">Launch activity</string>
+    <string name="remove_location_updates">Remove location updates</string>
+    <string name="location_updated">Location Updated: %1$s</string>
+
 </resources>
