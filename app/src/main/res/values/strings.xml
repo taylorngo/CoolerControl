@@ -24,16 +24,19 @@
 
     <string name="random_button_text">Random</string>
     <string name="count_button_text">Count</string>
-    <string name="temp_up_button">Temp Up</string>
-    <string name="temp_down_button">Temp Down</string>
+    <string name="temp_up_button">Up</string>
+    <string name="temp_down_button">Down</string>
     <string name="nav_image_text">Android App Image</string>
 
     <string name="user_manual">Howdy, welcome to the </string>
     <string name="tracker">Tracker</string>
     <string name="start">start</string>
     <string name="end">end</string>
-    <string name="ask_perm">Ask Permissions</string>
+    <string name="endis_BT">I/O Bluetooth</string>
+    <string name="endis_DSCV">I/O Discoverability</string>
+    <string name="endis_discover">Discover</string>
     <string name="rationale_bluetooth">This app needs access to your bluetooth to connect to the cooler.</string>
+    <string name="rationale_location">This app needs access to your location to track the cooler.</string>
     <string name="launch_activity">Launch activity</string>
     <string name="remove_location_updates">Remove location updates</string>
     <string name="location_updated">Location Updated: %1$s</string>
@@ -43,5 +46,6 @@
     <string name="affirmative">OK</string>
     <string name="cancel">Cancel</string>
     <string name="cont">Continue</string>
+    <string name="start_conn">Start Connection</string>
 
 </resources>

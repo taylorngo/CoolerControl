@@ -1,48 +1,58 @@
+//Location Utility
 package com.example.coolercontrol;
 
+import android.Manifest;
+import android.app.Activity;
+import android.app.AlertDialog;
 import android.content.Context;
+import android.content.DialogInterface;
+import android.content.pm.PackageManager;
 import android.location.Location;
+import android.os.Build;
 import android.preference.PreferenceManager;
+
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
 
 import java.text.DateFormat;
 import java.util.Date;
 
 
 public class Utils {
-    static final String KEY_REQUESTING_LOCATION_UPDATES = "requesting_location_updates";
+    public static final int MY_PERMISSIONS_REQUEST_LOCATION = 99;
 
-    /**
-     * Returns true if requesting location updates, otherwise returns false.
-     *
-     * @param context The {@link Context}.
-     */
-    static boolean requestingLocationUpdates(Context context) {
-        return PreferenceManager.getDefaultSharedPreferences(context)
-                .getBoolean(KEY_REQUESTING_LOCATION_UPDATES, false);
-    }
+    public static boolean checkLocationPermission(final Context context) {
+        int currentAPIVersion = Build.VERSION.SDK_INT;
+        if (currentAPIVersion >= android.os.Build.VERSION_CODES.M) {
 
-    /**
-     * Stores the location updates state in SharedPreferences.
-     * @param requestingLocationUpdates The location updates state.
-     */
-    static void setRequestingLocationUpdates(Context context, boolean requestingLocationUpdates) {
-        PreferenceManager.getDefaultSharedPreferences(context)
-                .edit()
-                .putBoolean(KEY_REQUESTING_LOCATION_UPDATES, requestingLocationUpdates)
-                .apply();
-    }
+            if (ActivityCompat.checkSelfPermission((Activity) context, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
 
-    /**
-     * Returns the {@code location} object as a human readable string.
-     * @param location  The {@link Location}.
-     */
-    static String getLocationText(Location location) {
-        return location == null ? "Unknown location" :
-                "(" + location.getLatitude() + ", " + location.getLongitude() + ")";
-    }
+                if (ActivityCompat.shouldShowRequestPermissionRationale((Activity) context, Manifest.permission.ACCESS_FINE_LOCATION)) {
+                    AlertDialog.Builder alertBuilder = new AlertDialog.Builder(context);
+                    alertBuilder.setCancelable(true);
+                    alertBuilder.setTitle("Permission necessary");
+                    alertBuilder.setMessage("Location permission is necessary");
+                    alertBuilder.setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
+                        public void onClick(DialogInterface dialog, int which) {
+                            ActivityCompat.requestPermissions((Activity) context,
+                                    new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, MY_PERMISSIONS_REQUEST_LOCATION);
+                        }
+                    });
+                    AlertDialog alert = alertBuilder.create();
+                    alert.show();
 
-    static String getLocationTitle(Context context) {
-        return context.getString(R.string.location_updated,
-                DateFormat.getDateTimeInstance().format(new Date()));
+                } else {
+                    //just request the permission
+                    ActivityCompat.requestPermissions((Activity) context,
+                            new String[]{Manifest.permission.ACCESS_FINE_LOCATION},
+                            MY_PERMISSIONS_REQUEST_LOCATION);
+                }
+                return false;
+            } else {
+                return true;
+            }
+        } else {
+            return true;
+        }
     }
 }

@@ -1,11 +1,16 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
     android:gravity="center_horizontal"
     android:background="@android:color/holo_green_light">
-
+<LinearLayout
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:gravity="center_horizontal"
+    >
     <TextView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -25,7 +30,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:gravity="start"
-        android:text="The application is able to control the medical specimen transport cooler. To be able to start access to the cooler you must click the 'ASK PERMISSIONS' button prior to use. The 'TEMP UP' button will change the temperature up 1 celsius. The 'TEMP DOWN' button will change the temperature down 1 celsius. The 'UPDATE SYSTEM' button will push and fetch information from the cooler and sync with the application. "
+        android:text="The application is able to control the medical specimen transport cooler. For first time setup, you must click the 'ENABLE/DISABLE BLUETOOTH' button prior to use to enable bluetooth. After bluetooth is enabled press 'DISCOVER' to scan for local bluetooth devices. Click on your cooler in the device list to pair the cooler and phone. After the Cooler is paired click 'START CONNECTION' to connect to the cooler. The 'TEMP UP' button will change the temperature up 1 celsius. The 'TEMP DOWN' button will change the temperature down 1 celsius. "
         android:textSize="18sp" />
 
     <TextView
@@ -39,8 +44,8 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:gravity="start"
-        android:text="Cloud Support"
-        android:textSize="30sp" />
+        android:text="The Cloud Support page will navigate you directly to the dashboard of the cloud storage."
+        android:textSize="18sp" />
 
     <TextView
         android:layout_width="wrap_content"
@@ -53,8 +58,8 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:gravity="start"
-        android:text="GPS Support"
-        android:textSize="30sp" />
-
+        android:text="The GPS Fragment is responsible for tracking the location of the cooler and displaying it's route on a map. To begin tracking, please allow the application location permissions and click start. Once you have arrived at your destination you may click 'END' to complete the course. Once completed a route will be drawn on the map and data will be sent to the cloud for storage."
+        android:textSize="18sp" />
 
 </LinearLayout>
+</ScrollView>
