@@ -26,10 +26,11 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.core.view.GravityCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
+import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 
 import com.google.android.material.navigation.NavigationView;
 
-import java.io.IOException;
+import java.io.InputStream;
 import java.io.OutputStream;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
@@ -45,7 +46,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
     BluetoothConnectionService mBluetoothConnection;
     private static final UUID myUUID = UUID.fromString("7044e056-b61a-11ec-b909-0242ac120002");
-    private static String address = "04:33:C2:68:28:E1";
+    private static String PCaddress = "04:33:C2:68:28:E1";
     BluetoothDevice mBTDevice;
     BluetoothAdapter bluetoothAdapter;//setup bluetooth
     BluetoothSocket btSocket = null;
@@ -54,6 +55,8 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     ListView lvNewDevices;
     EditText etSend;
     private OutputStream outStream = null;
+    private InputStream inStream = null;
+    BluetoothDevice DesktopServer;
 
     private Set <BluetoothDevice> mPairedDevices;
 
@@ -69,7 +72,9 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
     public String str_count= "20";
     TextView showCountTextView;
+    TextView serverMessage;
     Integer temp_count;
+    StringBuilder messages;
     private static final String TAG = "MainActivity";
 
     @Override
@@ -79,7 +84,13 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         checkBTPermissions();
 
         bluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
+        DesktopServer = bluetoothAdapter.getRemoteDevice(PCaddress);
         etSend = (EditText) findViewById(R.id.editText);
+        serverMessage = (TextView) findViewById(R.id.serverMessage);
+        messages = new StringBuilder();
+
+        LocalBroadcastManager.getInstance(this).registerReceiver(mReceiver, new IntentFilter("incomingMessage"));
+
 
 
         findViewById(R.id.down_count_button).setOnClickListener(new View.OnClickListener() {
@@ -111,19 +122,18 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         findViewById(R.id.btnStartConnection).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                startConnection();
+                startBTConnection(mBTDevice,myUUID);
+
+                serverMessage.setText("Incoming Server Message");
             }
         });
         findViewById(R.id.btnSend).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 byte[] bytes = etSend.getText().toString().getBytes(Charset.defaultCharset());
-                try{
-                    outStream.write(bytes);
-                    etSend.clearAnimation();
-                }catch (IOException e){
-                    Log.e(TAG, " Failed to send message to server");
-                }
+                mBluetoothConnection.write(bytes);
+
+                etSend.setText("");
             }
         });
 
@@ -151,13 +161,19 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         lvNewDevices.setOnItemClickListener(MainActivity.this);
     }
 
-    public void startConnection(){
-        startBTConnection(mBTDevice, myUUID);
-    }
+    BroadcastReceiver mReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            serverMessage.setText("");
+            String text = intent.getStringExtra("theMessage");
+            serverMessage.setText(text);
+        }
+    };
 
     public void startBTConnection(BluetoothDevice device, UUID uuid){
         Log.d(TAG, "startBTConnection: Initializing Rfcomm Bluetooth Connection.");
         mBluetoothConnection.startClient(device, uuid);
+
     }
     public void countUp(View view) {
         //Get the value of the text view
@@ -337,7 +353,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 //case1 : bonded already
                 if(mDevice.getBondState() == BluetoothDevice.BOND_BONDED){
                     Log.d(TAG, "BR4: BOND_BONDED");
-                    mBTDevice = mDevice;
                 }
                 //case2: Creating a bond
                 if(mDevice.getBondState() == BluetoothDevice.BOND_BONDING){
@@ -438,51 +453,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     }
 
     @Override
-    public void onResume(){
-        super.onResume();
-
-        BluetoothDevice device = bluetoothAdapter.getRemoteDevice(address);
-
-        try{
-            btSocket = device.createRfcommSocketToServiceRecord(myUUID);
-        } catch (IOException e){
-            Log.e(TAG, "Failed to create a connection to the UUID: " + e.getMessage());
-        }
-
-        bluetoothAdapter.cancelDiscovery();
-
-        try{
-            btSocket.connect();
-            Log.d(TAG, "Connection Established");
-        } catch (IOException e){
-            Log.e(TAG, "Connection failed to establish: " + e.getMessage());
-        }
-
-        try{
-            outStream = btSocket.getOutputStream();
-        }catch (IOException e){
-            Log.e(TAG, "Output stream connection failed" );
-        }
-    }
-
-    @Override
-    public void onPause(){
-        super.onPause();
-        if(outStream != null){
-            try{
-                outStream.flush();
-            } catch (IOException e){
-                Log.e(TAG, "Failed to flush outstream: " + e.getMessage());
-            }
-        }
-        try{
-            btSocket.close();
-        } catch (IOException e){
-            Log.e(TAG, "Failed to close socket: " + e.getMessage());
-        }
-    }
-
-    @Override
     public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
         //first cancel discovery because it is very memory intensive
         bluetoothAdapter.cancelDiscovery();
@@ -498,6 +468,9 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         if(Build.VERSION.SDK_INT > Build.VERSION_CODES.JELLY_BEAN_MR2){
             Log.d(TAG, "Trying to pair with " + deviceName);
             mBTDevices.get(i).createBond();
+
+            mBTDevice = mBTDevices.get(i);
+            mBluetoothConnection = new BluetoothConnectionService(MainActivity.this);
         }
     }
 }

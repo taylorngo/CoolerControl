@@ -129,6 +129,12 @@
             android:text="Send"
             android:layout_below="@id/LabelText"
             android:layout_toRightOf="@id/editText"/>
+        <TextView
+            android:layout_width="250dp"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/editText"
+            android:id="@+id/serverMessage"
+            android:text="Incoming Server Message"/>
 
     </RelativeLayout>
 
