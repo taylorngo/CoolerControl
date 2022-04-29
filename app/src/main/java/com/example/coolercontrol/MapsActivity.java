@@ -51,13 +51,12 @@ public class MapsActivity extends AppCompatActivity
     private GoogleMap mMap;
     private Location mCurrentLocation;
     private static final String KEY_LOCATION = "location";
-    private final LatLng defaultLocation = new LatLng(30.612651, -96.333572);
     private static final String TAG = MapsActivity.class.getSimpleName();
     private boolean startTracking;
     private ArrayList<LatLng> geoPoints = new ArrayList<>();
     private Button mRequestLocationUpdatesButton;
     private Button mRemoveLocationUpdatesButton;
-    private TextView txtLocation;
+
     private static final String[] LOCATION_PERM = {
             Manifest.permission.ACCESS_COARSE_LOCATION,
             Manifest.permission.ACCESS_FINE_LOCATION,
@@ -75,7 +74,6 @@ public class MapsActivity extends AppCompatActivity
 
 
         // Obtain the SupportMapFragment and get notified when the map is ready to be used.
-        txtLocation = (TextView) findViewById(R.id.location_txt);
         SupportMapFragment mapFragment =
                 (SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map);
         mapFragment.getMapAsync(new OnMapReadyCallback() {
@@ -93,17 +91,9 @@ public class MapsActivity extends AppCompatActivity
                     public View getInfoContents(Marker marker) {
                         View infoWindow = getLayoutInflater().inflate(R.layout.activity_maps, (FrameLayout) findViewById(R.id.map), false);
 
-                        txtLocation = infoWindow.findViewById(R.id.location_txt);
-                        txtLocation.setText(marker.getTitle());
-
                         return infoWindow;
                     }
                 });
-                mMap.addMarker(new MarkerOptions()
-                        .position(defaultLocation)
-                        .title("Zachary"));
-                mMap.moveCamera(CameraUpdateFactory.newLatLng(defaultLocation));
-
             }
         });
 
@@ -114,15 +104,10 @@ public class MapsActivity extends AppCompatActivity
         mRequestLocationUpdatesButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                if(hasLocationPermission()) {
                     startLocationService();
                     mMap.setMyLocationEnabled(true);
                     startTracking = true;
                     setButtonsState(true);
-                } else{
-                    Toast.makeText(MapsActivity.this, "Permission not granted", Toast.LENGTH_SHORT).show();
-                }
-
             }
         });
         mRemoveLocationUpdatesButton.setOnClickListener(new View.OnClickListener(){
@@ -238,7 +223,7 @@ public class MapsActivity extends AppCompatActivity
     }
 
     private void checkLocationPerms(){
-        if (Build.VERSION.SDK_INT > Build.VERSION_CODES.S) {
+        if (Build.VERSION.SDK_INT > Build.VERSION_CODES.O) {
             if(!EasyPermissions.hasPermissions(this, LOCATION_PERM)){
                 EasyPermissions.requestPermissions(this,getString(R.string.rationale_bluetooth), LOCATION_PERMISSION_REQUEST_CODE, LOCATION_PERM);
             }

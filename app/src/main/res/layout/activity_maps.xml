@@ -36,15 +36,6 @@
             android:text="@string/end" />
     </LinearLayout>
 
-    <TextView
-        android:id="@+id/location_txt"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:gravity="center"
-        android:textSize="24sp"
-        android:text="Location"
-        android:textStyle="bold" />
-
     <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent">
