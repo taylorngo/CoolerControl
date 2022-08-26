@@ -32,7 +32,7 @@ public class BluetoothConnectionService {
     private UUID deviceUUID;
     ProgressDialog mProgressDialog;
 
-
+    
     public BluetoothConnectionService(Context context){
         mContext = context;
         mBluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
@@ -194,7 +194,7 @@ public class BluetoothConnectionService {
             } catch(NullPointerException e){
                 Log.e(TAG, "No Progress Dialog box exists " + e.getMessage());
             }
-
+            //check if the input and output stream was created
             try{
                 tmpIn = mmSocket.getInputStream();
                 tmpOut = mmSocket.getOutputStream();

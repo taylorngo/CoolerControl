@@ -1,4 +1,4 @@
-//Location Services
+//Location Services (need comments)
 package com.example.coolercontrol;
 
 import android.app.NotificationChannel;
@@ -7,8 +7,6 @@ import android.app.PendingIntent;
 import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
-
-import android.location.Location;
 import android.os.Build;
 import android.os.IBinder;
 import android.os.Looper;
@@ -23,10 +21,7 @@ import com.google.android.gms.location.LocationCallback;
 import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationResult;
 import com.google.android.gms.location.LocationServices;
-import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.model.LatLng;
-import com.google.android.gms.maps.model.MarkerOptions;
-import com.google.android.gms.maps.model.PolylineOptions;
 
 import java.util.ArrayList;
 
@@ -34,15 +29,15 @@ import java.util.ArrayList;
 public class LocationService extends Service {
 
     private static final String TAG = LocationService.class.getSimpleName();
+    private static final int LOCATION_SERVICE_ID = 175;
     private static final long UPDATE_INTERVAL = 15000;  /* 15 secs */
     private static final long FASTEST_INTERVAL = 5000; /* 5 sec */
-    private static final float mGPSAccuracyLevel = 5f;
-    public static final String MY_LOCATION = "MY_CURRENT_LOCATION";
-    public static final String INTENT_LOCATION_VALUE = "currentLocation";
+    private static final String ACTION_START_LOCATION_SERVICE = "startLocationService";
+    private static final String ACTION_STOP_LOCATION_SERVICE = "stopLocationService";
     private ArrayList<LatLng> geoPoints = new ArrayList<>();
-    public static final String GPS_NOT_ENABLED = "GPS_NOT_ENABLED";
     Context mContext;
-
+    
+    //LocationCallback function to acquire coordinates of user's location
     private LocationCallback locationCallback = new LocationCallback() {
         @Override
         public void onLocationResult(@NonNull LocationResult locationResult) {
@@ -62,6 +57,7 @@ public class LocationService extends Service {
         throw new UnsupportedOperationException("Not yet implemented");
     }
 
+    //function to start location services
     private void startLocationService(){
         String channelId = "location_notification_channel";
         NotificationManager notificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
@@ -90,9 +86,10 @@ public class LocationService extends Service {
         locationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
 
         LocationServices.getFusedLocationProviderClient(this).requestLocationUpdates(locationRequest, locationCallback, Looper.getMainLooper());
-        startForeground(Constants.LOCATION_SERVICE_ID, builder.build());
+        startForeground(LOCATION_SERVICE_ID, builder.build());
     }
 
+    //function to pause location services
     private void stopLocationService(){
         LocationServices.getFusedLocationProviderClient(this).removeLocationUpdates(locationCallback);
         stopForeground(true);
@@ -104,21 +101,23 @@ public class LocationService extends Service {
         stopSelf();
     }
 
+    //controls buttons to start and stop location services
     @Override
     public int onStartCommand(Intent intent, int flags, int startId){
         if(intent != null){
             String action = intent.getAction();
             if (action != null){
-                if(action.equals(Constants.ACTION_START_LOCATION_SERVICE)){
+                if (action.equals(ACTION_START_LOCATION_SERVICE)) {
                     startLocationService();
-                } else if (action.equals(Constants.ACTION_STOP_LOCATION_SERVICE)){
+                } else if (action.equals(ACTION_STOP_LOCATION_SERVICE)) {
                     stopLocationService();
                 }
             }
         }
         return super.onStartCommand(intent, flags, startId);
     }
-
+    
+    //function to update an array with user's coordinates
     private void handleNewLocation(LocationResult locationResult) {
 
         double currentLatitude = locationResult.getLastLocation().getLatitude();

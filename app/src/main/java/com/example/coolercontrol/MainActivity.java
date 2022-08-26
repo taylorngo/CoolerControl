@@ -1,4 +1,4 @@
-//Main Activity
+//Main Activity (need comments)
 package com.example.coolercontrol;
 
 import android.Manifest;
@@ -49,7 +49,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     private static String PCaddress = "04:33:C2:68:28:E1";
     BluetoothDevice mBTDevice;
     BluetoothAdapter bluetoothAdapter;//setup bluetooth
-    BluetoothSocket btSocket = null;
     public ArrayList<BluetoothDevice> mBTDevices = new ArrayList<>(); //BluetoothDevice array list to hold discovered devices
     public DeviceListAdapter mDeviceListAdapter;
     ListView lvNewDevices;

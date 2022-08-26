@@ -17,13 +17,14 @@ public class DeviceListAdapter extends ArrayAdapter<BluetoothDevice> {
     private ArrayList<BluetoothDevice> mDevices;
     private int  mViewResourceId;
 
+    //Create an adapter that will store found bluetooth devices
     public DeviceListAdapter(Context context, int tvResourceId, ArrayList<BluetoothDevice> devices){
         super(context, tvResourceId,devices);
         this.mDevices = devices;
         mLayoutInflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         mViewResourceId = tvResourceId;
     }
-
+    //Retrieve data from bluetooth device and displays
     public View getView(int position, View convertView, ViewGroup parent) {
         convertView = mLayoutInflater.inflate(mViewResourceId, null);
 

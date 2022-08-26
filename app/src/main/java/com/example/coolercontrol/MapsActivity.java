@@ -1,4 +1,4 @@
-//Map Activity
+//Map Activity (need comments)
 package com.example.coolercontrol;
 
 
@@ -18,23 +18,17 @@ import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.FrameLayout;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 
-import com.google.android.gms.location.FusedLocationProviderClient;
-import com.google.android.gms.location.LocationCallback;
-import com.google.android.gms.location.LocationRequest;
-import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
-import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.maps.model.PolylineOptions;
 
 import java.util.ArrayList;
@@ -52,11 +46,14 @@ public class MapsActivity extends AppCompatActivity
     private Location mCurrentLocation;
     private static final String KEY_LOCATION = "location";
     private static final String TAG = MapsActivity.class.getSimpleName();
+    private static final String ACTION_START_LOCATION_SERVICE = "startLocationService";
+    private static final String ACTION_STOP_LOCATION_SERVICE = "stopLocationService";
     private boolean startTracking;
     private ArrayList<LatLng> geoPoints = new ArrayList<>();
     private Button mRequestLocationUpdatesButton;
     private Button mRemoveLocationUpdatesButton;
 
+    //location permissions
     private static final String[] LOCATION_PERM = {
             Manifest.permission.ACCESS_COARSE_LOCATION,
             Manifest.permission.ACCESS_FINE_LOCATION,
@@ -128,6 +125,7 @@ public class MapsActivity extends AppCompatActivity
         }
     };
 
+    //function to check if location service is running
     private boolean isLocationServiceRunning(){
         ActivityManager activityManager = (ActivityManager) getSystemService(Context.ACTIVITY_SERVICE);
         if(activityManager != null){
@@ -143,19 +141,21 @@ public class MapsActivity extends AppCompatActivity
         return false;
     }
 
+    //function to start location service
     private void startLocationService(){
         if(!isLocationServiceRunning()){
             Intent intent = new Intent(getApplicationContext(), LocationService.class);
-            intent.setAction(Constants.ACTION_START_LOCATION_SERVICE);
+            intent.setAction(ACTION_START_LOCATION_SERVICE);
             startService(intent);
             Toast.makeText(this, "location service started", Toast.LENGTH_SHORT).show();
         }
     }
 
+    //function to stop location service
     private void stopLocationService(){
         if(isLocationServiceRunning()){
             Intent intent = new Intent(getApplicationContext(), LocationService.class);
-            intent.setAction(Constants.ACTION_STOP_LOCATION_SERVICE);
+            intent.setAction(ACTION_STOP_LOCATION_SERVICE);
             startService(intent);
             Toast.makeText(this, "location service stopped", Toast.LENGTH_SHORT).show();
         }
@@ -196,11 +196,12 @@ public class MapsActivity extends AppCompatActivity
 
 
 
+    //function to prompt users if they want to end tracking
     public void finishTracking(){
         startTracking = false;
         AlertDialog.Builder finishedDialog = new AlertDialog.Builder(MapsActivity.this);
-        finishedDialog.setTitle("Confirm Run Completion?");
-        finishedDialog.setMessage("This will stop and save the current run if you continue.");
+        finishedDialog.setTitle("Confirm tracking complete?");
+        finishedDialog.setMessage("This will stop and save the current tracking if you continue.");
         finishedDialog.setPositiveButton(R.string.cont, new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
@@ -217,11 +218,7 @@ public class MapsActivity extends AppCompatActivity
         finishedDialog.show();
     }
 
-
-    private boolean hasLocationPermission() {
-        return EasyPermissions.hasPermissions(this, LOCATION_PERM);
-    }
-
+    //check if user has location permissions
     private void checkLocationPerms(){
         if (Build.VERSION.SDK_INT > Build.VERSION_CODES.O) {
             if(!EasyPermissions.hasPermissions(this, LOCATION_PERM)){

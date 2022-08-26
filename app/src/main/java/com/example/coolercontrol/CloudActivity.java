@@ -13,8 +13,9 @@ public class CloudActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        //Display the activity cloud layout
         setContentView(R.layout.activity_cloud);
-
+        //Create a webView window
         webView = (WebView)  findViewById(R.id.web_cloud);
         webView.loadUrl("https://www.google.com");
         //Load Javascript
