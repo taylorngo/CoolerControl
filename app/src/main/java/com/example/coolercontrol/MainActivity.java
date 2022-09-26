@@ -107,7 +107,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         findViewById(R.id.btnUpdate).setOnClickListener(new View.OnClickListener(){
             @Override
             public void onClick(View view){
-                updateCooler();
+                updateCooler(view);
             }
         });
 
