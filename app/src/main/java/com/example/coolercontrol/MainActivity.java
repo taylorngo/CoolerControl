@@ -4,13 +4,14 @@ package com.example.coolercontrol;
 import android.Manifest;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
-import android.bluetooth.BluetoothSocket;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Message;
 import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
@@ -30,8 +31,6 @@ import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 
 import com.google.android.material.navigation.NavigationView;
 
-import java.io.InputStream;
-import java.io.OutputStream;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.List;
@@ -42,23 +41,29 @@ import pub.devrel.easypermissions.AppSettingsDialog;
 import pub.devrel.easypermissions.EasyPermissions;
 
 public class MainActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener, EasyPermissions.PermissionCallbacks, AdapterView.OnItemClickListener {
-    DrawerLayout drawer;
-
-    BluetoothConnectionService mBluetoothConnection;
-    private static final UUID myUUID = UUID.fromString("7044e056-b61a-11ec-b909-0242ac120002");
-    private static String PCaddress = "04:33:C2:68:28:E1";
-    BluetoothDevice mBTDevice;
-    BluetoothAdapter bluetoothAdapter;//setup bluetooth
-    public ArrayList<BluetoothDevice> mBTDevices = new ArrayList<>(); //BluetoothDevice array list to hold discovered devices
+    private static final String TAG = "MainActivity";
+    public ArrayList<BluetoothDevice> mBTDevices = new ArrayList<>();
+    public ArrayList<BluetoothDevice> pairedList = new ArrayList<>();
     public DeviceListAdapter mDeviceListAdapter;
+    public String str_count= "20";
+
+    DrawerLayout drawer;
+    String deviceName = null;
+    BluetoothDevice mBTDevice;
     ListView lvNewDevices;
     EditText etSend;
-    private OutputStream outStream = null;
-    private InputStream inStream = null;
-    BluetoothDevice DesktopServer;
+    TextView showCountTextView;
+    TextView serverMessage;
+    TextView status;
+    Integer temp_count;
+    StringBuilder messages;
 
-    private Set <BluetoothDevice> mPairedDevices;
-
+    private BluetoothConnectionService mBluetoothConnection = null;
+    private BluetoothAdapter bluetoothAdapter = null;
+    private String mConnectedDeviceName = null;
+    private StringBuffer mOutStringBuffer;
+    private StringBuffer mInStringBuffer;
+    private static final int BLUETOOTH_PERMISSION_CODE = 104;
     private static final String[] BLUETOOTH_PERM = {
             Manifest.permission.BLUETOOTH,
             Manifest.permission.BLUETOOTH_ADMIN,
@@ -67,31 +72,39 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             Manifest.permission.BLUETOOTH_CONNECT,
             Manifest.permission.BLUETOOTH_PRIVILEGED
     };
-    private static final int BLUETOOTH_PERMISSION_CODE = 104;
 
-    public String str_count= "20";
-    TextView showCountTextView;
-    TextView serverMessage;
-    Integer temp_count;
-    StringBuilder messages;
-    private static final String TAG = "MainActivity";
+
+
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        // Check for bluetooth permissions on start up
         checkBTPermissions();
 
         bluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
-        DesktopServer = bluetoothAdapter.getRemoteDevice(PCaddress);
         etSend = (EditText) findViewById(R.id.editText);
         serverMessage = (TextView) findViewById(R.id.serverMessage);
-        messages = new StringBuilder();
+        status = (TextView) findViewById(R.id.status);
 
+
+        messages = new StringBuilder();
         LocalBroadcastManager.getInstance(this).registerReceiver(mReceiver, new IntentFilter("incomingMessage"));
 
+        // Initialize the BluetoothConnectionServer to perform bluetooth connections
+        mBluetoothConnection = new BluetoothConnectionService(this, mHandler);
+
+        // Initialize the buffer for outgoing and incoming messages
+        mOutStringBuffer = new StringBuffer("");
+        mInStringBuffer = new StringBuffer("");
 
 
+
+
+        // Button Functionality
         findViewById(R.id.down_count_button).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -104,7 +117,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 countUp(view);
             }
         });
-        findViewById(R.id.btnONOFF).setOnClickListener(new View.OnClickListener() {
+/*        findViewById(R.id.btnONOFF).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 if(hasBluetoothPermissions()){
@@ -117,11 +130,11 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             public void onClick(View view) {
                 btnDiscover();
             }
-        });
+        });*/
         findViewById(R.id.btnStartConnection).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                startBTConnection(mBTDevice,myUUID);
+                startBTConnection(mBTDevice);
 
                 serverMessage.setText("Incoming Server Message");
             }
@@ -149,6 +162,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         lvNewDevices = (ListView) findViewById(R.id.lvNewDevices);
         mBTDevices = new ArrayList<>();
 
+        // Controls action of Drawer menu
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(this, drawer, toolbar,
                 R.string.navigation_drawer_open, R.string.navigation_drawer_close);
         drawer.addDrawerListener(toggle);
@@ -160,6 +174,12 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         lvNewDevices.setOnItemClickListener(MainActivity.this);
     }
 
+    @Override
+    protected void onResume(){
+        super.onResume();
+        pairedDevicesList();
+    }
+
     BroadcastReceiver mReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
@@ -169,10 +189,9 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         }
     };
 
-    public void startBTConnection(BluetoothDevice device, UUID uuid){
+    public void startBTConnection(BluetoothDevice device){
         Log.d(TAG, "startBTConnection: Initializing Rfcomm Bluetooth Connection.");
-        mBluetoothConnection.startClient(device, uuid);
-
+        mBluetoothConnection.connect(device, 1, true);
     }
     public void countUp(View view) {
         //Get the value of the text view
@@ -434,14 +453,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         str_count = savedInstanceState.getString("bun_count");
     }
 
-    public void onRationaleAccepted(int requestCode) {
-        Log.d(TAG, "onRationaleAccepted:" + requestCode);
-    }
-
-    public void onRationaleDenied(int requestCode) {
-        Log.d(TAG, "onRationaleDenied:" + requestCode);
-    }
-
     @Override
     protected void onDestroy() {
         // Don't forget to unregister the ACTION_FOUND receiver.
@@ -457,19 +468,145 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         bluetoothAdapter.cancelDiscovery();
 
         Log.d(TAG, "onItemClick: You clicked a device");
-        String deviceName = mBTDevices.get(i).getName();
-        String deviceAddress = mBTDevices.get(i).getAddress();
+        mBTDevice = mBTDevices.get(i);
+        String deviceName = mBTDevice.getName();
+        String deviceAddress = mBTDevice.getAddress();
 
         Log.d(TAG, "onItemClick: deviceName = " + deviceName);
         Log.d(TAG, "onItemClick: deviceAddress = " + deviceAddress);
+    }
 
-        //Create the bond
-        if(Build.VERSION.SDK_INT > Build.VERSION_CODES.JELLY_BEAN_MR2){
-            Log.d(TAG, "Trying to pair with " + deviceName);
-            mBTDevices.get(i).createBond();
+    private void pairedDevicesList(){
+        Set<BluetoothDevice> pairedDevices = bluetoothAdapter.getBondedDevices();
+        for(BluetoothDevice bt : pairedDevices)
+            pairedList.add(bt);
 
-            mBTDevice = mBTDevices.get(i);
-            mBluetoothConnection = new BluetoothConnectionService(MainActivity.this);
+        mDeviceListAdapter = new DeviceListAdapter(getApplicationContext(), R.layout.device_adapter_view, pairedList);
+        lvNewDevices.setAdapter(mDeviceListAdapter);
+        lvNewDevices.setOnItemClickListener(myListClickListener);
+    }
+
+    private AdapterView.OnItemClickListener myListClickListener = new AdapterView.OnItemClickListener() {
+        public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
+
+            Log.d(TAG, "onItemClick: You clicked a device");
+            mBTDevice = pairedList.get(i);
+            String deviceName = mBTDevice.getName();
+            String deviceAddress = mBTDevice.getAddress();
+
+            Log.d(TAG, "onItemClick: deviceName = " + deviceName);
+            Log.d(TAG, "onItemClick: deviceAddress = " + deviceAddress);
+
+        }
+    };
+
+    //used to build message to send
+    private String buildMessage(String operation, int value){
+        return (operation + "," + String.valueOf(value) + "\n");
+    }
+    /*
+     used to send data to bluetooth server
+     send(buildMessage("1", 1)
+     assign operations to "1", "2", "3",...
+    */
+    public void send(String message){
+        // Check that we're actually connected before trying to send anything
+        if(mBluetoothConnection.getState() != BluetoothConnectionService.STATE_CONNECTED){
+            Toast.makeText(getApplicationContext(), "can't send message - not connected", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        // Check that there's actually something to send
+        if (message.length() > 0){
+            byte[] send = message.getBytes();
+            mBluetoothConnection.write(send);
+
+            // Reset out string buffer to zero and clear the edit text field
+            mOutStringBuffer.setLength(0);
+            etSend.getText().clear();
         }
     }
+
+    private void disconnect(){
+        if (mBluetoothConnection != null){
+            mBluetoothConnection.stop();
+        }
+    }
+
+    //displays message in text view
+    private void msg(String message){
+        TextView statusView = (TextView) findViewById(R.id.status);
+        statusView.setText(message);
+    }
+
+    private void parseData(String data){
+        // add message to the buffer
+        mInStringBuffer.append(data);
+
+        // find any complete messages
+        String[] messages = mInStringBuffer.toString().split("\\n");
+        int noOfMessages = messages.length;
+        // does the last message end in a \n, if not its incomplete and should be ignored
+        if(!mInStringBuffer.toString().endsWith("\n")){
+            noOfMessages = noOfMessages - 1;
+        }
+
+        // clean the data buffer of any processed messages
+        if (mInStringBuffer.lastIndexOf("\n") > -1)
+            mInStringBuffer.delete(0, mInStringBuffer.lastIndexOf("\n") + 1);
+
+    }
+
+
+    private final Handler mHandler = new Handler(){
+        @Override
+        public void handleMessage(Message msg){
+
+            switch(msg.what){
+                case Constants.MESSAGE_STATE_CHANGE:
+                    switch (msg.arg1){
+                        case BluetoothConnectionService.STATE_CONNECTED:
+                            Log.d("status","connected");
+                            msg("Connected to " + deviceName);
+                            send("3," + Constants.PROTOCOL_VERSION + "," + Constants.CLIENT_NAME + "\n");
+                            break;
+                            case BluetoothConnectionService.STATE_CONNECTING:
+                                Log.d("status","connecting");
+                                msg("Connecting to " + deviceName);
+                                break;
+                                case BluetoothConnectionService.STATE_LISTEN:
+                                    case BluetoothConnectionService.STATE_NONE:
+                                        Log.d("status", "not connected'");
+                                        msg("Not connected");
+                                        disconnect();
+                                        break;
+                    }
+                    break;
+                    case Constants.MESSAGE_WRITE:
+                        byte[] writeBuf = (byte[]) msg.obj;
+                        // construct a string from the buffer
+                        String writeMessage = new String(writeBuf);
+                        break;
+                        case Constants.MESSAGE_READ:
+                            byte[] readBuf = (byte[]) msg.obj;
+                            // construct a string from the valid bytes in the buffer
+                            String readData = new String(readBuf, 0 , msg.arg1);
+                            // message received
+                            parseData(readData);
+                            break;
+                            case Constants.MESSAGE_DEVICE_NAME:
+                                //save the connected devices name
+                                mConnectedDeviceName = msg.getData().getString(Constants.DEVICE_NAME);
+                                if( null != this) {
+                                    Toast.makeText(getApplicationContext(), "Connected to " + mConnectedDeviceName, Toast.LENGTH_SHORT).show();
+                                }
+                                break;
+                                case Constants.MESSAGE_TOAST:
+                                    if (null != this){
+                                        Toast.makeText(getApplicationContext(), msg.getData().getString(Constants.TOAST), Toast.LENGTH_SHORT).show();
+                                    }
+                                    break;
+            }
+        }
+    };
 }
