@@ -13,7 +13,9 @@
         <entry key="..\:/Users/Taylor/AndroidStudioProjects/CoolerControl/app/src/main/res/layout/fragment_help.xml" value="0.2563405797101449" />
         <entry key="..\:/Users/Taylor/AndroidStudioProjects/CoolerControl/app/src/main/res/layout/nav_header.xml" value="0.2563405797101449" />
         <entry key="..\:/Users/Taylor/AndroidStudioProjects/CoolerControl/app/src/main/res/menu/drawer_menu.xml" value="0.31354166666666666" />
+        <entry key="app/src/main/res/drawable/circle.xml" value="0.2725" />
         <entry key="app/src/main/res/drawable/ic_help.xml" value="0.2135" />
+        <entry key="app/src/main/res/drawable/rounded_corner.xml" value="0.17" />
         <entry key="app/src/main/res/layout/activity_cloud.xml" value="0.1" />
         <entry key="app/src/main/res/layout/activity_gpsactivity.xml" value="0.1" />
         <entry key="app/src/main/res/layout/activity_help.xml" value="0.18237915039062502" />

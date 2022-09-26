@@ -4,10 +4,7 @@ package com.example.coolercontrol;
 import android.Manifest;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
-import android.content.BroadcastReceiver;
-import android.content.Context;
 import android.content.Intent;
-import android.content.IntentFilter;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
@@ -16,7 +13,6 @@ import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
-import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -27,20 +23,17 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.core.view.GravityCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
-import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 
 import com.google.android.material.navigation.NavigationView;
 
-import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
-import java.util.UUID;
 
 import pub.devrel.easypermissions.AppSettingsDialog;
 import pub.devrel.easypermissions.EasyPermissions;
 
-public class MainActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener, EasyPermissions.PermissionCallbacks, AdapterView.OnItemClickListener {
+public class MainActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener, EasyPermissions.PermissionCallbacks {
     private static final String TAG = "MainActivity";
     public ArrayList<BluetoothDevice> mBTDevices = new ArrayList<>();
     public ArrayList<BluetoothDevice> pairedList = new ArrayList<>();
@@ -49,14 +42,12 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
     DrawerLayout drawer;
     String deviceName = null;
+    String deviceAddress = null;
     BluetoothDevice mBTDevice;
     ListView lvNewDevices;
-    EditText etSend;
     TextView showCountTextView;
-    TextView serverMessage;
     TextView status;
     Integer temp_count;
-    StringBuilder messages;
 
     private BluetoothConnectionService mBluetoothConnection = null;
     private BluetoothAdapter bluetoothAdapter = null;
@@ -73,10 +64,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             Manifest.permission.BLUETOOTH_PRIVILEGED
     };
 
-
-
-
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -86,13 +73,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         checkBTPermissions();
 
         bluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
-        etSend = (EditText) findViewById(R.id.editText);
-        serverMessage = (TextView) findViewById(R.id.serverMessage);
         status = (TextView) findViewById(R.id.status);
-
-
-        messages = new StringBuilder();
-        LocalBroadcastManager.getInstance(this).registerReceiver(mReceiver, new IntentFilter("incomingMessage"));
 
         // Initialize the BluetoothConnectionServer to perform bluetooth connections
         mBluetoothConnection = new BluetoothConnectionService(this, mHandler);
@@ -117,35 +98,10 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 countUp(view);
             }
         });
-/*        findViewById(R.id.btnONOFF).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                if(hasBluetoothPermissions()){
-                    enableDisableBT();
-                }
-            }
-        });
-        findViewById(R.id.btnDiscover).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                btnDiscover();
-            }
-        });*/
         findViewById(R.id.btnStartConnection).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 startBTConnection(mBTDevice);
-
-                serverMessage.setText("Incoming Server Message");
-            }
-        });
-        findViewById(R.id.btnSend).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                byte[] bytes = etSend.getText().toString().getBytes(Charset.defaultCharset());
-                mBluetoothConnection.write(bytes);
-
-                etSend.setText("");
             }
         });
 
@@ -167,11 +123,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 R.string.navigation_drawer_open, R.string.navigation_drawer_close);
         drawer.addDrawerListener(toggle);
         toggle.syncState();
-
-        //Broadcast when bond state changes
-        IntentFilter filter = new IntentFilter(BluetoothDevice.ACTION_BOND_STATE_CHANGED);
-        registerReceiver(mBroadcastReceiver4, filter);
-        lvNewDevices.setOnItemClickListener(MainActivity.this);
     }
 
     @Override
@@ -179,15 +130,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         super.onResume();
         pairedDevicesList();
     }
-
-    BroadcastReceiver mReceiver = new BroadcastReceiver() {
-        @Override
-        public void onReceive(Context context, Intent intent) {
-            serverMessage.setText("");
-            String text = intent.getStringExtra("theMessage");
-            serverMessage.setText(text);
-        }
-    };
 
     public void startBTConnection(BluetoothDevice device){
         Log.d(TAG, "startBTConnection: Initializing Rfcomm Bluetooth Connection.");
@@ -201,6 +143,9 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         temp_count++;
         //Display the new value in text view
         showCountTextView.setText(temp_count.toString());
+
+        //Send msg to server
+        send(buildMessage("1",1));
     }
     public void countDwn(View view) {
         //Get the value of the text view
@@ -210,67 +155,9 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         temp_count--;
         //Display the new value in text view
         showCountTextView.setText(temp_count.toString());
-    }
 
-    public void enableDisableBT(){
-        checkBTPermissions();
-        if(bluetoothAdapter == null){
-            Log.d(TAG,"enableDisableBT: Does not have bluetooth capabilities.");
-        }
-        if(!bluetoothAdapter.isEnabled()){
-            Log.d(TAG,"enableDisableBT: enabling bluetooth.");
-            Intent enableBTIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
-            startActivity(enableBTIntent);
-
-            IntentFilter BTIntent = new IntentFilter(BluetoothAdapter.ACTION_STATE_CHANGED);
-            registerReceiver(mBroadcastReceiver1, BTIntent);
-        }
-        if(bluetoothAdapter.isEnabled()){
-            Log.d(TAG,"enableDisableBT: turning off bluetooth");
-            bluetoothAdapter.disable();
-
-            IntentFilter BTIntent = new IntentFilter(BluetoothAdapter.ACTION_STATE_CHANGED);
-            registerReceiver(mBroadcastReceiver1, BTIntent);
-        }
-    }
-    //TODO: Crashes but ZTE Phone does not show logcat
-/*    public void enableDisableDiscovery(){
-        Log.d(TAG, "btnEnableDisableDiscovery: Making device discoverable for 300 seconds.");
-
-        Intent discoverableIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_DISCOVERABLE);
-        discoverableIntent.putExtra(BluetoothAdapter.EXTRA_DISCOVERABLE_DURATION, 300);
-        startActivity(discoverableIntent);
-
-        IntentFilter intentFilter = new IntentFilter(bluetoothAdapter.ACTION_SCAN_MODE_CHANGED);
-        registerReceiver(mBroadcastReceiver2, intentFilter);
-    }*/
-    public void btnDiscover(){
-        checkBTPermissions();
-        Log.d(TAG, "btnDiscover: Looking for unpaired devices.");
-
-        if(bluetoothAdapter.isDiscovering()){
-            bluetoothAdapter.cancelDiscovery();
-            Log.d(TAG, "btnDiscover: Cancelling discovery.");
-
-            //check BT permissions
-            checkBTPermissions();
-
-            bluetoothAdapter.startDiscovery();
-            IntentFilter discoverDevicesIntent = new IntentFilter(BluetoothDevice.ACTION_FOUND);
-            registerReceiver(mBroadcastReceiver3, discoverDevicesIntent);
-            }
-        if(!bluetoothAdapter.isDiscovering()){
-            checkBTPermissions();
-
-            bluetoothAdapter.startDiscovery();
-            IntentFilter discoverDevicesIntent = new IntentFilter(BluetoothDevice.ACTION_FOUND);
-            registerReceiver(mBroadcastReceiver3, discoverDevicesIntent);
-
-        }
-    }
-
-    private boolean hasBluetoothPermissions(){
-        return EasyPermissions.hasPermissions(this, BLUETOOTH_PERM);
+        //Send msg to server
+        send(buildMessage("2",1));
     }
 
     private void checkBTPermissions() {
@@ -280,109 +167,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             }
         }
     }
-
-    // Create a BroadcastReceiver for ACTION_FOUND
-    private final BroadcastReceiver mBroadcastReceiver1 = new BroadcastReceiver() {
-        public void onReceive(Context context, Intent intent) {
-            String action = intent.getAction();
-            // When discovery finds a device
-            if (action.equals(bluetoothAdapter.ACTION_STATE_CHANGED)) {
-                final int state = intent.getIntExtra(BluetoothAdapter.EXTRA_STATE, bluetoothAdapter.ERROR);
-
-                switch(state){
-                    case BluetoothAdapter.STATE_OFF:
-                        Log.d(TAG, "onReceive: STATE OFF");
-                        break;
-                    case BluetoothAdapter.STATE_TURNING_OFF:
-                        Log.d(TAG, "mBroadcastReceiver1: STATE TURNING OFF");
-                        break;
-                    case BluetoothAdapter.STATE_ON:
-                        Log.d(TAG, "mBroadcastReceiver1: STATE ON");
-                        break;
-                    case BluetoothAdapter.STATE_TURNING_ON:
-                        Log.d(TAG, "mBroadcastReceiver1: STATE TURNING ON");
-                        break;
-                }
-            }
-        }
-    };
-    //Create a BroadcastReceiver for ACTION_FOUND
-/*    private BroadcastReceiver mBroadcastReceiver2 = new BroadcastReceiver() {
-        @Override
-        public void onReceive(Context context, Intent intent) {
-            final String action = intent.getAction();
-            Log.d(TAG, "onReceive: ACTION FOUND.");
-
-            if (action.equals(BluetoothAdapter.ACTION_SCAN_MODE_CHANGED)){
-                int mode = intent.getIntExtra(BluetoothAdapter.EXTRA_SCAN_MODE, BluetoothAdapter.ERROR);
-
-                switch(mode){
-                    //Device is in discoverable mode
-                    case BluetoothAdapter.SCAN_MODE_CONNECTABLE_DISCOVERABLE:
-                        Log.d(TAG, "BR2: Discoverability enabled");
-                        break;
-                    case BluetoothAdapter.SCAN_MODE_CONNECTABLE:
-                        Log.d(TAG, "BR2: Discoverability disabled. Able to receive connections from paired devices.");
-                        break;
-                    case BluetoothAdapter.SCAN_MODE_NONE:
-                        Log.d(TAG, "BR2: Discoverability disabled. Not able to receive connections.");
-                        break;
-                    case BluetoothAdapter.STATE_CONNECTING:
-                        Log.d(TAG, "BR2: Connecting...");
-                        break;
-                    case BluetoothAdapter.STATE_CONNECTED:
-                        Log.d(TAG, "BR2: Connected");
-                        break;
-                }
-                BluetoothDevice device = intent.getParcelableExtra (BluetoothDevice.EXTRA_DEVICE);
-                mBTDevices.add(device);
-                Log.d(TAG, "onReceive: " + device.getName() + ": " + device.getAddress());
-                mDeviceListAdapter = new DeviceListAdapter(context, R.layout.device_adapter_view, mBTDevices);
-                lvNewDevices.setAdapter(mDeviceListAdapter);
-            }
-        }
-    };*/
-
-    private BroadcastReceiver mBroadcastReceiver3 = new BroadcastReceiver() {
-        @Override
-        public void onReceive(Context context, Intent intent) {
-            final String action =  intent.getAction();
-            Log.d(TAG, "BR3: ACTION_FOUND");
-
-            if(action.equals(BluetoothDevice.ACTION_FOUND)){
-                BluetoothDevice device = intent.getParcelableExtra(BluetoothDevice.EXTRA_DEVICE);
-                mBTDevices.add(device);
-                Log.d(TAG, "BR3: " + device.getName() + ": " + device.getAddress());
-                mDeviceListAdapter = new DeviceListAdapter(context, R.layout.device_adapter_view, mBTDevices);
-                lvNewDevices.setAdapter(mDeviceListAdapter);
-            }
-        }
-    };
-
-    private BroadcastReceiver mBroadcastReceiver4 = new BroadcastReceiver() {
-        @Override
-        public void onReceive(Context context, Intent intent) {
-            final String action = intent.getAction();
-            Log.d(TAG, "BR4: ACTION FOUND");
-
-            if(action.equals(BluetoothDevice.ACTION_BOND_STATE_CHANGED)){
-                BluetoothDevice mDevice = intent.getParcelableExtra(BluetoothDevice.EXTRA_DEVICE);
-                //3 cases:
-                //case1 : bonded already
-                if(mDevice.getBondState() == BluetoothDevice.BOND_BONDED){
-                    Log.d(TAG, "BR4: BOND_BONDED");
-                }
-                //case2: Creating a bond
-                if(mDevice.getBondState() == BluetoothDevice.BOND_BONDING){
-                    Log.d(TAG, "BR4: BOND_BONDING");
-                }
-                //case3: breaking a bond
-                if(mDevice.getBondState() == BluetoothDevice.BOND_NONE){
-                    Log.d(TAG, "BR4: BOND_NONE");
-                }
-            }
-        }
-    };
 
     @Override
     public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
@@ -455,28 +239,11 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
     @Override
     protected void onDestroy() {
-        // Don't forget to unregister the ACTION_FOUND receiver.
-        unregisterReceiver(mBroadcastReceiver1);
-        unregisterReceiver(mBroadcastReceiver3);
-        unregisterReceiver(mBroadcastReceiver4);
         super.onDestroy();
     }
 
-    @Override
-    public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
-        //first cancel discovery because it is very memory intensive
-        bluetoothAdapter.cancelDiscovery();
-
-        Log.d(TAG, "onItemClick: You clicked a device");
-        mBTDevice = mBTDevices.get(i);
-        String deviceName = mBTDevice.getName();
-        String deviceAddress = mBTDevice.getAddress();
-
-        Log.d(TAG, "onItemClick: deviceName = " + deviceName);
-        Log.d(TAG, "onItemClick: deviceAddress = " + deviceAddress);
-    }
-
     private void pairedDevicesList(){
+        pairedList.clear();
         Set<BluetoothDevice> pairedDevices = bluetoothAdapter.getBondedDevices();
         for(BluetoothDevice bt : pairedDevices)
             pairedList.add(bt);
@@ -491,8 +258,8 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
             Log.d(TAG, "onItemClick: You clicked a device");
             mBTDevice = pairedList.get(i);
-            String deviceName = mBTDevice.getName();
-            String deviceAddress = mBTDevice.getAddress();
+            deviceName = mBTDevice.getName();
+            deviceAddress = mBTDevice.getAddress();
 
             Log.d(TAG, "onItemClick: deviceName = " + deviceName);
             Log.d(TAG, "onItemClick: deviceAddress = " + deviceAddress);
@@ -523,7 +290,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
             // Reset out string buffer to zero and clear the edit text field
             mOutStringBuffer.setLength(0);
-            etSend.getText().clear();
         }
     }
 
@@ -546,6 +312,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         // find any complete messages
         String[] messages = mInStringBuffer.toString().split("\\n");
         int noOfMessages = messages.length;
+
         // does the last message end in a \n, if not its incomplete and should be ignored
         if(!mInStringBuffer.toString().endsWith("\n")){
             noOfMessages = noOfMessages - 1;
