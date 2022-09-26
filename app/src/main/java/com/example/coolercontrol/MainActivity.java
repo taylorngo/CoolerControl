@@ -104,6 +104,12 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 startBTConnection(mBTDevice);
             }
         });
+        findViewById(R.id.btnUpdate).setOnClickListener(new View.OnClickListener(){
+            @Override
+            public void onClick(View view){
+                updateCooler();
+            }
+        });
 
         showCountTextView = (TextView) findViewById(R.id.textview_first);
         showCountTextView.setText(str_count);
@@ -159,14 +165,11 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         //Send msg to server
         send(buildMessage("2",1));
     }
-
-    private void checkBTPermissions() {
-        if (Build.VERSION.SDK_INT > Build.VERSION_CODES.S) {
-            if(!EasyPermissions.hasPermissions(this, BLUETOOTH_PERM)){
-                EasyPermissions.requestPermissions(this,getString(R.string.rationale_bluetooth), BLUETOOTH_PERMISSION_CODE, BLUETOOTH_PERM);
-            }
-        }
+    public void updateCooler(View view){
+        send(buildMessage("3",0));
     }
+
+
 
     @Override
     public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
@@ -242,6 +245,13 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         super.onDestroy();
     }
 
+    private void checkBTPermissions() {
+        if (Build.VERSION.SDK_INT > Build.VERSION_CODES.S) {
+            if(!EasyPermissions.hasPermissions(this, BLUETOOTH_PERM)){
+                EasyPermissions.requestPermissions(this,getString(R.string.rationale_bluetooth), BLUETOOTH_PERMISSION_CODE, BLUETOOTH_PERM);
+            }
+        }
+    }
     private void pairedDevicesList(){
         pairedList.clear();
         Set<BluetoothDevice> pairedDevices = bluetoothAdapter.getBondedDevices();
@@ -252,7 +262,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         lvNewDevices.setAdapter(mDeviceListAdapter);
         lvNewDevices.setOnItemClickListener(myListClickListener);
     }
-
     private AdapterView.OnItemClickListener myListClickListener = new AdapterView.OnItemClickListener() {
         public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
 
@@ -266,8 +275,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
         }
     };
-
-    //used to build message to send
     private String buildMessage(String operation, int value){
         return (operation + "," + String.valueOf(value) + "\n");
     }
