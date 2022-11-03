@@ -1,0 +1,23 @@
+{
+  "dev": {
+    "awscloudformation": {
+      "AuthRoleName": "amplify-coolercontrol-dev-172256-authRole",
+      "UnauthRoleArn": "arn:aws:iam::324081980996:role/amplify-coolercontrol-dev-172256-unauthRole",
+      "AuthRoleArn": "arn:aws:iam::324081980996:role/amplify-coolercontrol-dev-172256-authRole",
+      "Region": "us-east-1",
+      "DeploymentBucketName": "amplify-coolercontrol-dev-172256-deployment",
+      "UnauthRoleName": "amplify-coolercontrol-dev-172256-unauthRole",
+      "StackName": "amplify-coolercontrol-dev-172256",
+      "StackId": "arn:aws:cloudformation:us-east-1:324081980996:stack/amplify-coolercontrol-dev-172256/be938d00-557c-11ed-a2aa-0a4c7c5d7d75",
+      "AmplifyAppId": "d184rxics0cflp"
+    },
+    "categories": {
+      "auth": {
+        "coolercontrolfe3ba0bd": {}
+      },
+      "storage": {
+        "RouteArray": {}
+      }
+    }
+  }
+}

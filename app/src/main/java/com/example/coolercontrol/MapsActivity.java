@@ -3,6 +3,7 @@ package com.example.coolercontrol;
 
 
 import android.Manifest;
+import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.ActivityManager;
 import android.app.AlertDialog;
@@ -24,13 +25,17 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 
+import com.amplifyframework.core.Amplify;
+import com.amplifyframework.core.model.temporal.Temporal;
+import com.amplifyframework.datastore.generated.model.Coordinate;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
-import com.google.android.gms.maps.model.PolylineOptions;
+import com.google.android.gms.maps.model.MarkerOptions;
 
+import com.google.android.gms.maps.model.PolylineOptions;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -49,9 +54,12 @@ public class MapsActivity extends AppCompatActivity
     private static final String ACTION_START_LOCATION_SERVICE = "startLocationService";
     private static final String ACTION_STOP_LOCATION_SERVICE = "stopLocationService";
     private boolean startTracking;
+    private List<Double> longitude = new ArrayList<>();
+    private List<Double> latitude = new ArrayList<>();
     private ArrayList<LatLng> geoPoints = new ArrayList<>();
     private Button mRequestLocationUpdatesButton;
     private Button mRemoveLocationUpdatesButton;
+    private Button cloudSaveButton;
 
     //location permissions
     private static final String[] LOCATION_PERM = {
@@ -98,21 +106,30 @@ public class MapsActivity extends AppCompatActivity
 
         mRequestLocationUpdatesButton = (Button) findViewById(R.id.startButton);
         mRemoveLocationUpdatesButton = (Button) findViewById(R.id.endButton);
+        cloudSaveButton = (Button) findViewById(R.id.saveButton);
         mRequestLocationUpdatesButton.setOnClickListener(new View.OnClickListener() {
+            @SuppressLint("MissingPermission")
             @Override
             public void onClick(View view) {
-                    startLocationService();
-                    mMap.setMyLocationEnabled(true);
-                    startTracking = true;
-                    setButtonsState(true);
+                startLocationService();
+                mMap.setMyLocationEnabled(true);
+                startTracking = true;
+                setButtonsState(true);
             }
         });
-        mRemoveLocationUpdatesButton.setOnClickListener(new View.OnClickListener(){
+        mRemoveLocationUpdatesButton.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onClick(View view){
+            public void onClick(View view) {
                 finishTracking();
             }
         });
+        cloudSaveButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                saveTracking();
+            }
+        });
+        setButtonsState(isLocationServiceRunning());
     }
 
     BroadcastReceiver mReceiver = new BroadcastReceiver() {
@@ -122,6 +139,13 @@ public class MapsActivity extends AppCompatActivity
             geoPoints = intent.getParcelableArrayListExtra("theRoute");
             PolylineOptions routeOptions = new PolylineOptions().addAll(geoPoints).color(R.color.ColorPolyline).width(10).visible(true);
             mMap.addPolyline(routeOptions);
+
+            LatLng firstMarker = geoPoints.get(0);
+            LatLng lastMarker = geoPoints.get(geoPoints.size() - 1);
+
+
+            mMap.addMarker(new MarkerOptions().position(firstMarker));
+            mMap.addMarker(new MarkerOptions().position(lastMarker));
         }
     };
 
@@ -218,11 +242,30 @@ public class MapsActivity extends AppCompatActivity
         finishedDialog.show();
     }
 
+    //function to store tracking data into phone
+    public void saveTracking() {
+        for (int i = 0; i < geoPoints.size(); i++) {
+            latitude.add(geoPoints.get(i).latitude);
+            longitude.add(geoPoints.get(i).longitude);
+        }
+        Coordinate item = Coordinate.builder()
+                .datetime(new Temporal.DateTime("1970-01-01T12:30:23.999Z"))
+                .latitude(latitude)
+                .longitude(longitude)
+                .build();
+        Amplify.DataStore.save(
+                item,
+                success -> Log.i("Amplify", "Saved item: " + success.item().getId()),
+                error -> Log.e("Amplify", "Could not save item to DataStore", error)
+        );
+
+    }
+
     //check if user has location permissions
-    private void checkLocationPerms(){
+    private void checkLocationPerms() {
         if (Build.VERSION.SDK_INT > Build.VERSION_CODES.O) {
-            if(!EasyPermissions.hasPermissions(this, LOCATION_PERM)){
-                EasyPermissions.requestPermissions(this,getString(R.string.rationale_bluetooth), LOCATION_PERMISSION_REQUEST_CODE, LOCATION_PERM);
+            if (!EasyPermissions.hasPermissions(this, LOCATION_PERM)) {
+                EasyPermissions.requestPermissions(this, getString(R.string.rationale_bluetooth), LOCATION_PERMISSION_REQUEST_CODE, LOCATION_PERM);
             }
         }
     }
@@ -255,6 +298,7 @@ public class MapsActivity extends AppCompatActivity
     @Override
     protected void onResume(){
         super.onResume();
+        setButtonsState(isLocationServiceRunning());
     }
 
     private void setButtonsState(boolean requestingLocationUpdates) {

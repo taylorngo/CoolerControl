@@ -30,7 +30,8 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:gravity="start"
-        android:text="The application is able to control the medical specimen transport cooler. For first time setup, you must click the 'ENABLE/DISABLE BLUETOOTH' button prior to use to enable bluetooth. After bluetooth is enabled press 'DISCOVER' to scan for local bluetooth devices. Click on your cooler in the device list to pair the cooler and phone. After the Cooler is paired click 'START CONNECTION' to connect to the cooler. The 'TEMP UP' button will change the temperature up 1 celsius. The 'TEMP DOWN' button will change the temperature down 1 celsius. "
+        android:text="The application is able to control the medical specimen transport cooler. For first time setup, you must pair the Cooler and mobile phone. Click on your cooler in the device list then click 'START CONNECTION' to connect to the cooler.
+        The 'UP' button will change the temperature up 1 celsius. The 'DOWN' button will change the temperature down 1 celsius. The 'UPDATE TEMP' button will send the desired temperature to the cooler. It is best used in cases where the cooler and app lose connection."
         android:textSize="18sp" />
 
     <TextView
@@ -58,7 +59,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:gravity="start"
-        android:text="The GPS Fragment is responsible for tracking the location of the cooler and displaying it's route on a map. To begin tracking, please allow the application location permissions and click start. Once you have arrived at your destination you may click 'END' to complete the course. Once completed a route will be drawn on the map and data will be sent to the cloud for storage."
+        android:text="The GPS Fragment is responsible for tracking the location of the cooler and displaying it's route on a map. To begin tracking, please allow the application location permissions and click start. Once you have arrived at your destination you may click 'END' to complete the course. Once completed a route will be drawn on the map. Two markers will be drawn on the route to indicate starting and end point."
         android:textSize="18sp" />
 
 </LinearLayout>

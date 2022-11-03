@@ -1,0 +1,7 @@
+type Coordinate @model @auth(rules: [{allow: public}]) {
+  id: ID!
+  datetime: AWSDateTime
+  latitude: [Float]
+  longitude: [Float]
+}
+ 

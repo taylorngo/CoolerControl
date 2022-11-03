@@ -15,6 +15,6 @@ public class Constants {
 
     public static final float BORDER_THICKNESS = (float)0.025;
 
-    public static final String PROTOCOL_VERSION = "2";
+    public static final String PROTOCOL_VERSION = "15";
     public static final String CLIENT_NAME = "Cooler Controller Android app";
 }

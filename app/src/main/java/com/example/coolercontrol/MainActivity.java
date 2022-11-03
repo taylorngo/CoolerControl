@@ -2,6 +2,7 @@
 package com.example.coolercontrol;
 
 import android.Manifest;
+import android.annotation.SuppressLint;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
 import android.content.Intent;
@@ -24,11 +25,19 @@ import androidx.appcompat.widget.Toolbar;
 import androidx.core.view.GravityCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
 
+import com.amplifyframework.AmplifyException;
+import com.amplifyframework.core.Amplify;
+import com.amplifyframework.core.model.temporal.Temporal;
+import com.amplifyframework.datastore.AWSDataStorePlugin;
+import com.amplifyframework.datastore.generated.model.Coordinate;
 import com.google.android.material.navigation.NavigationView;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.Set;
+import java.util.TimeZone;
+import java.util.concurrent.TimeUnit;
 
 import pub.devrel.easypermissions.AppSettingsDialog;
 import pub.devrel.easypermissions.EasyPermissions;
@@ -38,7 +47,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     public ArrayList<BluetoothDevice> mBTDevices = new ArrayList<>();
     public ArrayList<BluetoothDevice> pairedList = new ArrayList<>();
     public DeviceListAdapter mDeviceListAdapter;
-    public String str_count= "20";
+    public String str_count= "15";
 
     DrawerLayout drawer;
     String deviceName = null;
@@ -166,7 +175,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         send(buildMessage("2",1));
     }
     public void updateCooler(View view){
-        send(buildMessage("3",0));
+        send(buildMessage("3",temp_count));
     }
 
 
@@ -254,7 +263,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     }
     private void pairedDevicesList(){
         pairedList.clear();
-        Set<BluetoothDevice> pairedDevices = bluetoothAdapter.getBondedDevices();
+        @SuppressLint("MissingPermission") Set<BluetoothDevice> pairedDevices = bluetoothAdapter.getBondedDevices();
         for(BluetoothDevice bt : pairedDevices)
             pairedList.add(bt);
 
@@ -263,6 +272,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         lvNewDevices.setOnItemClickListener(myListClickListener);
     }
     private AdapterView.OnItemClickListener myListClickListener = new AdapterView.OnItemClickListener() {
+        @SuppressLint("MissingPermission")
         public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
 
             Log.d(TAG, "onItemClick: You clicked a device");

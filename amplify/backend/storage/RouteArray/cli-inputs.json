@@ -1,0 +1,13 @@
+{
+  "resourceName": "RouteArray",
+  "policyUUID": "e3343cfd",
+  "bucketName": "coolercontrolbucket",
+  "storageAccess": "auth",
+  "guestAccess": [],
+  "authAccess": [
+    "CREATE_AND_UPDATE",
+    "READ",
+    "DELETE"
+  ],
+  "groupAccess": {}
+}
