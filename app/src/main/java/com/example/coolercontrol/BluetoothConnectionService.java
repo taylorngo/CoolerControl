@@ -1,5 +1,6 @@
 package com.example.coolercontrol;
 
+import android.annotation.SuppressLint;
 import android.app.ProgressDialog;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
@@ -131,6 +132,7 @@ public class BluetoothConnectionService {
     /*
      Start the ConnectedThread to begin managing a Bluetooth Connection
      */
+    @SuppressLint("MissingPermission")
     public synchronized void connected(BluetoothSocket socket, BluetoothDevice
                                        device, final String socketType){
         Log.d(TAG, "connected, Socket Type: " + socketType);
@@ -254,8 +256,9 @@ public class BluetoothConnectionService {
     private class AcceptThread extends Thread{
         //The local server socket
         private final BluetoothServerSocket mmServerSocket;
-        private String mSocketType;
+        private final String mSocketType;
 
+        @SuppressLint("MissingPermission")
         public AcceptThread(boolean secure){
             BluetoothServerSocket tmp = null;
             mSocketType = secure ? "Secure" : "Insecure";
@@ -338,6 +341,7 @@ public class BluetoothConnectionService {
         private final BluetoothDevice mmDevice;
         private String mSocketType;
 
+        @SuppressLint("MissingPermission")
         public ConnectThread(BluetoothDevice device, int port, boolean secure){
             Log.d(TAG, "ConnectThread: started.");
             mmDevice = device;
@@ -353,7 +357,7 @@ public class BluetoothConnectionService {
                         tmp = device.createRfcommSocketToServiceRecord(MY_UUID_SECURE);
                     }
                     else{
-                        Method createRfcommSocket = device.getClass().getMethod("createRfcommSocket", new Class[]{int.class});
+                        Method createRfcommSocket = device.getClass().getMethod("createRfcommSocket", int.class);
                         tmp = (BluetoothSocket) createRfcommSocket.invoke(device,port);
                     }
                 } else{
@@ -361,7 +365,7 @@ public class BluetoothConnectionService {
                         tmp = device.createInsecureRfcommSocketToServiceRecord(MY_UUID_INSECURE);
                     }
                     else{
-                        Method createInsecureRfcommSocket = device.getClass().getMethod("createInsecureRfcommSocket", new Class[]{int.class});
+                        Method createInsecureRfcommSocket = device.getClass().getMethod("createInsecureRfcommSocket", int.class);
                         tmp = (BluetoothSocket) createInsecureRfcommSocket.invoke(device, port);
                     }
                 }
@@ -372,6 +376,7 @@ public class BluetoothConnectionService {
             mState = STATE_CONNECTING;
         }
 
+        @SuppressLint("MissingPermission")
         public void run(){
             //Always cancel discovery because it will slow down connection
             mBluetoothAdapter.cancelDiscovery();
@@ -463,12 +468,6 @@ public class BluetoothConnectionService {
                     // Send the obtained bytes to the UI Activity
                     mHandler.obtainMessage(Constants.MESSAGE_READ, bytes, -1, buffer).sendToTarget();
 
-                    /*
-                    String incomingMessage = new String(buffer, 0, bytes);
-                    Intent incomingMessageIntent = new Intent("incomingMessage");
-                    incomingMessageIntent.putExtra("theMessage", incomingMessage);
-                    LocalBroadcastManager.getInstance(mContext).sendBroadcast(incomingMessageIntent);
-                    */
                 } catch (IOException e){
                     Log.e(TAG, "InputStream error reading input " + e.getMessage());
                     connectionLost();

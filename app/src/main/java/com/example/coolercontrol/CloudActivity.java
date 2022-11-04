@@ -11,8 +11,6 @@ import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
 
-import java.net.CookieStore;
-
 public class CloudActivity extends AppCompatActivity {
     public WebView webView;
 

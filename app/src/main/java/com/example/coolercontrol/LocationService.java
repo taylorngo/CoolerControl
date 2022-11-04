@@ -1,6 +1,7 @@
 //Location Services (need comments)
 package com.example.coolercontrol;
 
+import android.annotation.SuppressLint;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
@@ -34,11 +35,11 @@ public class LocationService extends Service {
     private static final long FASTEST_INTERVAL = 5000; /* 5 sec */
     private static final String ACTION_START_LOCATION_SERVICE = "startLocationService";
     private static final String ACTION_STOP_LOCATION_SERVICE = "stopLocationService";
-    private ArrayList<LatLng> geoPoints = new ArrayList<>();
+    private final ArrayList<LatLng> geoPoints = new ArrayList<>();
     Context mContext;
     
     //LocationCallback function to acquire coordinates of user's location
-    private LocationCallback locationCallback = new LocationCallback() {
+    private final LocationCallback locationCallback = new LocationCallback() {
         @Override
         public void onLocationResult(@NonNull LocationResult locationResult) {
             super.onLocationResult(locationResult);
@@ -58,6 +59,7 @@ public class LocationService extends Service {
     }
 
     //function to start location services
+    @SuppressLint("MissingPermission")
     private void startLocationService(){
         String channelId = "location_notification_channel";
         NotificationManager notificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);

@@ -25,19 +25,11 @@ import androidx.appcompat.widget.Toolbar;
 import androidx.core.view.GravityCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
 
-import com.amplifyframework.AmplifyException;
-import com.amplifyframework.core.Amplify;
-import com.amplifyframework.core.model.temporal.Temporal;
-import com.amplifyframework.datastore.AWSDataStorePlugin;
-import com.amplifyframework.datastore.generated.model.Coordinate;
 import com.google.android.material.navigation.NavigationView;
 
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 import java.util.Set;
-import java.util.TimeZone;
-import java.util.concurrent.TimeUnit;
 
 import pub.devrel.easypermissions.AppSettingsDialog;
 import pub.devrel.easypermissions.EasyPermissions;
@@ -88,8 +80,8 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         mBluetoothConnection = new BluetoothConnectionService(this, mHandler);
 
         // Initialize the buffer for outgoing and incoming messages
-        mOutStringBuffer = new StringBuffer("");
-        mInStringBuffer = new StringBuffer("");
+        mOutStringBuffer = new StringBuffer();
+        mInStringBuffer = new StringBuffer();
 
 
 
@@ -271,7 +263,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         lvNewDevices.setAdapter(mDeviceListAdapter);
         lvNewDevices.setOnItemClickListener(myListClickListener);
     }
-    private AdapterView.OnItemClickListener myListClickListener = new AdapterView.OnItemClickListener() {
+    private final AdapterView.OnItemClickListener myListClickListener = new AdapterView.OnItemClickListener() {
         @SuppressLint("MissingPermission")
         public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
 
@@ -286,7 +278,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         }
     };
     private String buildMessage(String operation, int value){
-        return (operation + "," + String.valueOf(value) + "\n");
+        return (operation + "," + value + "\n");
     }
     /*
      used to send data to bluetooth server

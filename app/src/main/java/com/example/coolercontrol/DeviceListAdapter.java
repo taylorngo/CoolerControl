@@ -1,5 +1,6 @@
 package com.example.coolercontrol;
 
+import android.annotation.SuppressLint;
 import android.bluetooth.BluetoothDevice;
 import android.content.Context;
 import android.view.LayoutInflater;
@@ -13,9 +14,9 @@ import java.util.ArrayList;
 
 public class DeviceListAdapter extends ArrayAdapter<BluetoothDevice> {
 
-    private LayoutInflater mLayoutInflater;
-    private ArrayList<BluetoothDevice> mDevices;
-    private int  mViewResourceId;
+    private final LayoutInflater mLayoutInflater;
+    private final ArrayList<BluetoothDevice> mDevices;
+    private final int  mViewResourceId;
 
     //Create an adapter that will store found bluetooth devices
     public DeviceListAdapter(Context context, int tvResourceId, ArrayList<BluetoothDevice> devices){
@@ -25,6 +26,7 @@ public class DeviceListAdapter extends ArrayAdapter<BluetoothDevice> {
         mViewResourceId = tvResourceId;
     }
     //Retrieve data from bluetooth device and displays
+    @SuppressLint("MissingPermission")
     public View getView(int position, View convertView, ViewGroup parent) {
         convertView = mLayoutInflater.inflate(mViewResourceId, null);
 

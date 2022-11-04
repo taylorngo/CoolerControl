@@ -59,7 +59,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:gravity="start"
-        android:text="The GPS Fragment is responsible for tracking the location of the cooler and displaying it's route on a map. To begin tracking, please allow the application location permissions and click start. Once you have arrived at your destination you may click 'END' to complete the course. Once completed a route will be drawn on the map. Two markers will be drawn on the route to indicate starting and end point."
+        android:text="The GPS Fragment is responsible for tracking the location of the cooler and displaying it's route on a map. To begin tracking, please allow the application location permissions and click start. Once you have arrived at your destination you may click 'END' to complete the course. Once completed a route will be drawn on the map. Two markers will be drawn on the route to indicate starting and end point. To save the route to the cloud click 'SAVE' to upload the route. To load routes from the cloud you may use the 'LOAD' button. To display any route from the cloud on the map just select a route from the list of routes stored in the cloud. "
         android:textSize="18sp" />
 
 </LinearLayout>
