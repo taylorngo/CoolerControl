@@ -40,7 +40,7 @@ public class RecyclerAdapter extends ArrayAdapter<Coordinate> {
             TextView cloudDate = (TextView) convertView.findViewById(R.id.cloud_date);
 
             if (cloudId != null) {
-                cloudId.setText(coord.getId());
+                cloudId.setText(coord.getName());
             }
             if (cloudDate != null) {
                 cloudDate.setText(coord.getDatetime().toString());

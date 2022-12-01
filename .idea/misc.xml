@@ -24,6 +24,7 @@
         <entry key="app/src/main/res/layout/activity_help.xml" value="0.1" />
         <entry key="app/src/main/res/layout/activity_main.xml" value="0.165" />
         <entry key="app/src/main/res/layout/activity_maps.xml" value="0.1" />
+        <entry key="app/src/main/res/layout/cloud_name.xml" value="0.1" />
         <entry key="app/src/main/res/layout/device_adapter_view.xml" value="0.1" />
         <entry key="app/src/main/res/layout/fragment_cloud.xml" value="0.1609375" />
         <entry key="app/src/main/res/layout/fragment_cooler.xml" value="0.27957916259765636" />

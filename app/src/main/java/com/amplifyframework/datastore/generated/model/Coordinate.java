@@ -26,21 +26,23 @@ import static com.amplifyframework.core.model.query.predicate.QueryField.field;
 })
 public final class Coordinate implements Model {
   public static final QueryField ID = field("Coordinate", "id");
-  public static final QueryField DATETIME = field("Coordinate", "datetime");
+  public static final QueryField NAME = field("Coordinate", "name");
   public static final QueryField LATITUDE = field("Coordinate", "latitude");
   public static final QueryField LONGITUDE = field("Coordinate", "longitude");
+  public static final QueryField DATETIME = field("Coordinate", "datetime");
   private final @ModelField(targetType="ID", isRequired = true) String id;
-  private final @ModelField(targetType="AWSDateTime") Temporal.DateTime datetime;
+  private final @ModelField(targetType="String") String name;
   private final @ModelField(targetType="Float") List<Double> latitude;
   private final @ModelField(targetType="Float") List<Double> longitude;
+  private final @ModelField(targetType="AWSDateTime") Temporal.DateTime datetime;
   private @ModelField(targetType="AWSDateTime", isReadOnly = true) Temporal.DateTime createdAt;
   private @ModelField(targetType="AWSDateTime", isReadOnly = true) Temporal.DateTime updatedAt;
   public String getId() {
       return id;
   }
   
-  public Temporal.DateTime getDatetime() {
-      return datetime;
+  public String getName() {
+      return name;
   }
   
   public List<Double> getLatitude() {
@@ -51,6 +53,10 @@ public final class Coordinate implements Model {
       return longitude;
   }
   
+  public Temporal.DateTime getDatetime() {
+      return datetime;
+  }
+  
   public Temporal.DateTime getCreatedAt() {
       return createdAt;
   }
@@ -59,11 +65,12 @@ public final class Coordinate implements Model {
       return updatedAt;
   }
   
-  private Coordinate(String id, Temporal.DateTime datetime, List<Double> latitude, List<Double> longitude) {
+  private Coordinate(String id, String name, List<Double> latitude, List<Double> longitude, Temporal.DateTime datetime) {
     this.id = id;
-    this.datetime = datetime;
+    this.name = name;
     this.latitude = latitude;
     this.longitude = longitude;
+    this.datetime = datetime;
   }
   
   @Override
@@ -75,9 +82,10 @@ public final class Coordinate implements Model {
       } else {
       Coordinate coordinate = (Coordinate) obj;
       return ObjectsCompat.equals(getId(), coordinate.getId()) &&
-              ObjectsCompat.equals(getDatetime(), coordinate.getDatetime()) &&
+              ObjectsCompat.equals(getName(), coordinate.getName()) &&
               ObjectsCompat.equals(getLatitude(), coordinate.getLatitude()) &&
               ObjectsCompat.equals(getLongitude(), coordinate.getLongitude()) &&
+              ObjectsCompat.equals(getDatetime(), coordinate.getDatetime()) &&
               ObjectsCompat.equals(getCreatedAt(), coordinate.getCreatedAt()) &&
               ObjectsCompat.equals(getUpdatedAt(), coordinate.getUpdatedAt());
       }
@@ -87,9 +95,10 @@ public final class Coordinate implements Model {
    public int hashCode() {
     return new StringBuilder()
       .append(getId())
-      .append(getDatetime())
+      .append(getName())
       .append(getLatitude())
       .append(getLongitude())
+      .append(getDatetime())
       .append(getCreatedAt())
       .append(getUpdatedAt())
       .toString()
@@ -101,9 +110,10 @@ public final class Coordinate implements Model {
     return new StringBuilder()
       .append("Coordinate {")
       .append("id=" + String.valueOf(getId()) + ", ")
-      .append("datetime=" + String.valueOf(getDatetime()) + ", ")
+      .append("name=" + String.valueOf(getName()) + ", ")
       .append("latitude=" + String.valueOf(getLatitude()) + ", ")
       .append("longitude=" + String.valueOf(getLongitude()) + ", ")
+      .append("datetime=" + String.valueOf(getDatetime()) + ", ")
       .append("createdAt=" + String.valueOf(getCreatedAt()) + ", ")
       .append("updatedAt=" + String.valueOf(getUpdatedAt()))
       .append("}")
@@ -127,44 +137,49 @@ public final class Coordinate implements Model {
       id,
       null,
       null,
+      null,
       null
     );
   }
   
   public CopyOfBuilder copyOfBuilder() {
     return new CopyOfBuilder(id,
-      datetime,
+      name,
       latitude,
-      longitude);
+      longitude,
+      datetime);
   }
   public interface BuildStep {
     Coordinate build();
     BuildStep id(String id);
-    BuildStep datetime(Temporal.DateTime datetime);
+    BuildStep name(String name);
     BuildStep latitude(List<Double> latitude);
     BuildStep longitude(List<Double> longitude);
+    BuildStep datetime(Temporal.DateTime datetime);
   }
   
 
   public static class Builder implements BuildStep {
     private String id;
-    private Temporal.DateTime datetime;
+    private String name;
     private List<Double> latitude;
     private List<Double> longitude;
+    private Temporal.DateTime datetime;
     @Override
      public Coordinate build() {
         String id = this.id != null ? this.id : UUID.randomUUID().toString();
         
         return new Coordinate(
           id,
-          datetime,
+          name,
           latitude,
-          longitude);
+          longitude,
+          datetime);
     }
     
     @Override
-     public BuildStep datetime(Temporal.DateTime datetime) {
-        this.datetime = datetime;
+     public BuildStep name(String name) {
+        this.name = name;
         return this;
     }
     
@@ -180,6 +195,12 @@ public final class Coordinate implements Model {
         return this;
     }
     
+    @Override
+     public BuildStep datetime(Temporal.DateTime datetime) {
+        this.datetime = datetime;
+        return this;
+    }
+    
     /**
      * @param id id
      * @return Current Builder instance, for fluent method chaining
@@ -192,16 +213,17 @@ public final class Coordinate implements Model {
   
 
   public final class CopyOfBuilder extends Builder {
-    private CopyOfBuilder(String id, Temporal.DateTime datetime, List<Double> latitude, List<Double> longitude) {
+    private CopyOfBuilder(String id, String name, List<Double> latitude, List<Double> longitude, Temporal.DateTime datetime) {
       super.id(id);
-      super.datetime(datetime)
+      super.name(name)
         .latitude(latitude)
-        .longitude(longitude);
+        .longitude(longitude)
+        .datetime(datetime);
     }
     
     @Override
-     public CopyOfBuilder datetime(Temporal.DateTime datetime) {
-      return (CopyOfBuilder) super.datetime(datetime);
+     public CopyOfBuilder name(String name) {
+      return (CopyOfBuilder) super.name(name);
     }
     
     @Override
@@ -212,6 +234,11 @@ public final class Coordinate implements Model {
     @Override
      public CopyOfBuilder longitude(List<Double> longitude) {
       return (CopyOfBuilder) super.longitude(longitude);
+    }
+    
+    @Override
+     public CopyOfBuilder datetime(Temporal.DateTime datetime) {
+      return (CopyOfBuilder) super.datetime(datetime);
     }
   }
   

@@ -7,6 +7,7 @@ import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.ActivityManager;
 import android.app.AlertDialog;
+import android.app.Dialog;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -25,6 +26,7 @@ import android.view.WindowManager;
 import android.view.translation.ViewTranslationCallback;
 import android.widget.AdapterView;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.FrameLayout;
 import android.widget.LinearLayout;
 import android.widget.ListView;
@@ -85,6 +87,8 @@ public class MapsActivity extends AppCompatActivity
     private Button cloudLoadButton;
     ListView listView;
     Context mContext;
+    Context sContext;
+    String cloudName;
     public ArrayList<Coordinate> loaded = new ArrayList<>();
     public RecyclerAdapter recyclerAdapter;
 
@@ -138,6 +142,7 @@ public class MapsActivity extends AppCompatActivity
         mRemoveLocationUpdatesButton = (Button) findViewById(R.id.endButton);
         cloudSaveButton = (Button) findViewById(R.id.saveButton);
         cloudLoadButton = (Button) findViewById(R.id.loadButton);
+        loaded.clear();
         mRequestLocationUpdatesButton.setOnClickListener(new View.OnClickListener() {
             @SuppressLint("MissingPermission")
             @Override
@@ -157,7 +162,24 @@ public class MapsActivity extends AppCompatActivity
         cloudSaveButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                saveTracking();
+                sContext = MapsActivity.this;
+                final Dialog dialog = new Dialog(sContext);
+                dialog.setContentView(R.layout.cloud_name);
+                final EditText et = (EditText) dialog.findViewById(R.id.cloud_name);
+                Button writeButton = (Button) dialog.findViewById(R.id.ok_button);
+
+                //alertDialogBuilder.setView(et);
+                dialog.show();
+                // set dialog message
+                writeButton.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        cloudName = et.getText().toString();
+                        dialog.dismiss();
+                        saveTracking();
+                    }
+                });
+
             }
         });
         cloudLoadButton.setOnClickListener(new View.OnClickListener() {
@@ -239,7 +261,6 @@ public class MapsActivity extends AppCompatActivity
         super.onStart();
         setButtonsState(startTracking);
         //queryFirstPage();
-
     }
 
     @Override
@@ -299,8 +320,10 @@ public class MapsActivity extends AppCompatActivity
             latitude.add(geoPoints.get(i).latitude);
             longitude.add(geoPoints.get(i).longitude);
         }
+
         String date1 = com.amazonaws.util.DateUtils.formatISO8601Date(new Date());
         Coordinate item = Coordinate.builder()
+                .name(cloudName)
                 .datetime(new Temporal.DateTime(date1))
                 .latitude(latitude)
                 .longitude(longitude)
@@ -366,23 +389,28 @@ public class MapsActivity extends AppCompatActivity
     private final AdapterView.OnItemClickListener cloudListClickListener = new AdapterView.OnItemClickListener() {
         @Override
         public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
-                Toast.makeText(getApplicationContext(), "You select value from list one " + loaded.get(i).getId(), Toast.LENGTH_LONG).show();
+                cloudLatitude.clear();
+                cloudLongitude.clear();
+                mMap.clear();
+                cloudPoints.clear();
+                Toast.makeText(getApplicationContext(), "You select value from list one " + loaded.get(i).getName(), Toast.LENGTH_LONG).show();
                 cloudLongitude = loaded.get(i).getLongitude();
                 cloudLatitude = loaded.get(i).getLatitude();
+                if(cloudLongitude.size() > 0) {
+                    for (int j = 0; j < cloudLongitude.size(); j++) {
+                        cloudPoints.add(new LatLng(cloudLatitude.get(j), cloudLongitude.get(j)));
+                    }
 
-                for(int j = 0; j < cloudLongitude.size(); j++){
-                    cloudPoints.add(new LatLng(cloudLatitude.get(j), cloudLongitude.get(j)));
+                    PolylineOptions cloudOptions = new PolylineOptions().addAll(cloudPoints).color(R.color.ColorPolyline).width(10).visible(true);
+                    Polyline polyline = mMap.addPolyline(cloudOptions);
+
+                    LatLng cloudFirstMarker = cloudPoints.get(0);
+                    LatLng cloudLastMarker = cloudPoints.get(cloudPoints.size() - 1);
+
+
+                    mMap.addMarker(new MarkerOptions().position(cloudFirstMarker));
+                    mMap.addMarker(new MarkerOptions().position(cloudLastMarker));
                 }
-                mMap.clear();
-                PolylineOptions cloudOptions = new PolylineOptions().addAll(cloudPoints).color(R.color.ColorPolyline).width(10).visible(true);
-                Polyline polyline = mMap.addPolyline(cloudOptions);
-
-                LatLng cloudFirstMarker = cloudPoints.get(0);
-                LatLng cloudLastMarker = cloudPoints.get(cloudPoints.size() - 1);
-
-
-                mMap.addMarker(new MarkerOptions().position(cloudFirstMarker));
-                mMap.addMarker(new MarkerOptions().position(cloudLastMarker));
         }
     };
 
@@ -391,21 +419,24 @@ public class MapsActivity extends AppCompatActivity
     }
 
     private void query(GraphQLRequest<PaginatedResult<Coordinate>> request) {
-        Amplify.API.query(
-                request,
-                response -> {
-                    if (response.hasData()) {
-                        for (Coordinate coordinate : response.getData()) {
-                            Log.d("MyAmplifyApp", coordinate.getId());
-                            loaded.add(coordinate);
+        if (loaded.size() > 0) {
+            loaded.clear();
+        }
+            Amplify.API.query(
+                    request,
+                    response -> {
+                        if (response.hasData()) {
+                            for (Coordinate coordinate : response.getData()) {
+                                Log.d("MyAmplifyApp", coordinate.getId());
+                                loaded.add(coordinate);
+                            }
+                            if (response.getData().hasNextResult()) {
+                                query(response.getData().getRequestForNextResult());
+                            }
                         }
-                        if (response.getData().hasNextResult()) {
-                            query(response.getData().getRequestForNextResult());
-                        }
-                    }
-                },
-                failure -> Log.e("MyAmplifyApp", "Query failed.", failure)
-        );
-    }
+                    },
+                    failure -> Log.e("MyAmplifyApp", "Query failed.", failure)
+            );
+        }
 }
 
